@@ -20,7 +20,7 @@ import java.util.Set;
  * Krazip is for sending a simple CruiseControl build result into IRC.
  * <p>Krazip requires IRClib for working.  (http://moepii.sourceforge.net/)<br>
  *
- * @author Pongvech Vechprasit
+ * @author Pongvech Vechprasit (pun@abctech-thailand.com)
  */
 
 public class KrazipIRCPublisher implements Publisher {
@@ -34,7 +34,6 @@ public class KrazipIRCPublisher implements Publisher {
     private String userName = "Krazip";
     private String realName = "Krazip CruiseControl IRC publisher";
     private String channel;
-    private String quitMessage = "G'day mate!";
     private String resultURL;
 
     /**
@@ -56,7 +55,7 @@ public class KrazipIRCPublisher implements Publisher {
         IRCconnection.doJoin(channel);
         String message = buildMessage(cruiseControlBuildLog);
         IRCconnection.doPrivmsg(channel, message);
-        IRCconnection.doQuit(quitMessage);
+        IRCconnection.doQuit();
     }
 
     /**
@@ -82,11 +81,11 @@ public class KrazipIRCPublisher implements Publisher {
         XMLLogHelper ccBuildLog = new XMLLogHelper(cruiseControlBuildLog);
         String msg = "";
         if (ccBuildLog.isBuildSuccessful()) {
-            msg += "Build completed successfully : " + ccBuildLog.getProjectName();
+            msg += "Build completed successfully for project \"" + ccBuildLog.getProjectName() +"\"";
         } else if (ccBuildLog.isBuildFix()) {
-            msg += "Build fixed : " + ccBuildLog.getProjectName();
+            msg += "Build fixed for project \"" + ccBuildLog.getProjectName() +"\"";
         } else {
-            msg += "Build FAILURE : " + ccBuildLog.getProjectName() + ". ";
+            msg += "Build FAILURE for project \"" + ccBuildLog.getProjectName() + "\". ";
             msg += "Includes changes by ";
             Set changeSet = ccBuildLog.getBuildParticipants();
             Iterator iter = changeSet.iterator();
@@ -98,14 +97,14 @@ public class KrazipIRCPublisher implements Publisher {
                 }
             }
         }
-        msg += ". Please see more details : " + getResultURL(ccBuildLog);
+        msg += ". Please see more details at " + getResultURL(ccBuildLog);
         return msg;
     }
 
     /**
-     * Build the IRC body message from a CruiseControl build log
+     * Build the IRC body message from a CruiseControl build log.
      *
-     * @param ccBuildLog <code>XMLLogHelper</code> - wrapper for the build log
+     * @param ccBuildLog <code>XMLLogHelper</code> wrapper for the build log
      * @return <code>String</code> as a URL for build log.
      */
     protected String getResultURL(XMLLogHelper ccBuildLog) {
@@ -136,7 +135,7 @@ public class KrazipIRCPublisher implements Publisher {
     }
 
     /**
-     * Called after the configuration is read to make sure that all the mandatory parameters were specified..
+     * Called after the configuration is read to make sure that all the mandatory parameters were specified.
      *
      *  @throws CruiseControlException if there was a configuration error.
      */
@@ -195,14 +194,6 @@ public class KrazipIRCPublisher implements Publisher {
 
     public void setRealName(String realName) {
         this.realName = realName;
-    }
-
-    public String getQuitMessage() {
-        return quitMessage;
-    }
-
-    public void setQuitMessage(String quitMessage) {
-        this.quitMessage = quitMessage;
     }
 
     public String getResultURL() {
