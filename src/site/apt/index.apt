@@ -2,5 +2,119 @@
               Krazip
               ----
 
- Integrating IRC with cruisecontrol in order to communicate
- build changes / errors / etc.
+Krazip Overview
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ Krazip is a simple CruiseControl plug-in for sending live build result whether it pass, failed or fixed to IRC channel.
+ It's developed on CruiseControl version 2.8.4 and use external irclib.jar for IRC communication library.
+
+[images/KrazipOverview.png]
+
+Krazip Installation on CruiseControl 2.8.4
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* To install Krazip on a CruiseControl server you need a following
+
+ * CruiseControl binary distribution version 2.8.4: {{http://cruisecontrol.sourceforge.net/}}
+
+ * Krazip library
+
+ * IRClib library {{http://moepii.sourceforge.net/}}
+
+ []
+
+* To install Krazip please follow steps below.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ * Go to lib folder in CruiseControl main folder.
+
+ * You will see a lot of jar files insides.
+
+ * Copy Krazip and IRClib jar files into the folder
+
+ * You are done!(Please continue on configuration below)
+
+ []
+
+
+Krazip Configuration (config.xml)
+~~~~~~~~~~~
+ First of all, because Krazip is not a bundled plug-in with CruiseControl. Therefore, you need to register it within config.xml file. Please see the example of plug-in registration below.
+
++---
+<plugin name="krazip" classname="net.sourceforge.cruisecontrol.publishers.KrazipIRCPublisher"/>
++---
+
+ Here you go. Now the plug-in is registered. Now, next step is to configure the Krazip it self for IRC host address, channel etc.
+
+ Krazip is the plug-in for sending build result. Thus, It's a publisher plug-in. We will put the Krazip configuration element in <publishers> element. Please see below for more details.
+
++---
+       <publishers>
+	   <krazip host="irc.linpro.no"
+	       port="6667"
+	       channel="#krazip"
+	       resulturl="http://localhost:8080/cruisecontrol/buildresults/${project.name}" />
+            <onsuccess>
+                <artifactspublisher dest="artifacts/${project.name}" file="projects/${project.name}/target/${project.name}.jar"/>
+            </onsuccess>
+        </publishers>
++---
+
+* There are some attributes you can config for Krazip
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ * host - address for IRC server
+ 
+ * port - IRC port number (Default 6667)
+
+ * channel - IRC channel for sending the build result
+ 
+ * resulturl - This address will be appended with log address automatically. (http://www.someurl.com/someProjectName?log=log123456789)
+ 
+ []
+
+ <<Example of full config.xml>> configured with Krazip (Used sample CruiseControl project "connectFour")
+
+ <<Example of message for this configuration if build is OK>> : "Build completed successfully for project "someProjectname" Please see more details at _[http://www.someurl.com/someProjectName?log=log123456789
+
++---
+<cruisecontrol>
+
+   <plugin name="krazip" classname="net.sourceforge.cruisecontrol.publishers.KrazipIRCPublisher"/>
+
+    <project name="connectfour">
+        <listeners>
+            <currentbuildstatuslistener file="logs/${project.name}/status.txt"/>
+        </listeners>
+
+        <bootstrappers>
+            <antbootstrapper anthome="apache-ant-1.7.0" buildfile="projects/${project.name}/build.xml" target="clean" />
+        </bootstrappers>
+
+        <modificationset quietperiod="15">
+            <!-- touch any file in connectfour project to trigger a build -->
+            <filesystem folder="projects/${project.name}"/>
+        </modificationset>
+
+        <schedule interval="30">
+            <ant anthome="apache-ant-1.7.0" buildfile="projects/${project.name}/build.xml"/>
+        </schedule>
+
+        <log>
+            <merge dir="projects/${project.name}/target/test-results"/>
+        </log>
+
+        <publishers>
+	   <krazip host="irc.linpro.no"
+	       port="6667"
+	       channel="#krazip"
+	       resulturl="http://localhost:8080/cruisecontrol/buildresults/${project.name}" />
+            <onsuccess>
+                <artifactspublisher dest="artifacts/${project.name}" file="projects/${project.name}/target/${project.name}.jar"/>
+            </onsuccess>
+        </publishers>
+
+    </project>
+</cruisecontrol>
++---
