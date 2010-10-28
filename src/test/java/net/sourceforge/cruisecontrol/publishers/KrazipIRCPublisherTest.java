@@ -6,7 +6,7 @@ import org.jdom.Element;
 import org.junit.Test;
 
 /**
- * Tests for KrazipIRCPublisher
+ * Tests for KrazipIRCPublisher Test
  *
  * @author Pongvech Vechprasit (pun@abctech-thailand.com)
  */
