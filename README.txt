@@ -40,5 +40,3 @@ Example configuration for config.xml :
     </project>
 
 </cruisecontrol>
-
-test
