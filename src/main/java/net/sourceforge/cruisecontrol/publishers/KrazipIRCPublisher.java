@@ -25,11 +25,12 @@ import java.util.Set;
 
 public class KrazipIRCPublisher implements Publisher {
 
-
+    private static final long serialVersionUID = 1L;
     private static final Logger LOG = Logger.getLogger(KrazipIRCPublisher.class);
-    private IRCConnection IRCconnection;
+    private static final int DEFAULT_IRC_PORT = 6667;
+    private IRCConnection ircConnection;
     private String host;
-    private int port = 6667;
+    private int port = DEFAULT_IRC_PORT;
     private String nickName = "Krazip";
     private String userName = "Krazip";
     private String realName = "Krazip CruiseControl IRC publisher";
@@ -44,30 +45,30 @@ public class KrazipIRCPublisher implements Publisher {
      * @param cruiseControlBuildLog - A CruiseControl build log
      * @throws CruiseControlException on any error
      */
-    public void publish(Element cruiseControlBuildLog) throws CruiseControlException {
+    public final void publish(Element cruiseControlBuildLog) throws CruiseControlException {
 
         init();
         try {
-            IRCconnection.connect();
+            ircConnection.connect();
         } catch (IOException ioe) {
             LOG.error("Error: Could not connect to IRC server", ioe);
         }
-        IRCconnection.doJoin(channel);
+        ircConnection.doJoin(channel);
         String message = buildMessage(cruiseControlBuildLog);
-        IRCconnection.doPrivmsg(channel, message);
-        IRCconnection.doQuit();
+        ircConnection.doPrivmsg(channel, message);
+        ircConnection.doQuit();
     }
 
     /**
      * Initialize an IRC connection.
      */
-    protected void init() {
-        IRCconnection = new IRCConnection(host, new int[]{port}, null, nickName, userName, realName);
-        IRCconnection.addIRCEventListener(new Listener());
-        IRCconnection.setEncoding("UTF-8");
-        IRCconnection.setPong(true);
-        IRCconnection.setDaemon(false);
-        IRCconnection.setColors(true);
+    protected final void init() {
+        ircConnection = new IRCConnection(host, new int[]{port}, null, nickName, userName, realName);
+        ircConnection.addIRCEventListener(new Listener());
+        ircConnection.setEncoding("UTF-8");
+        ircConnection.setPong(true);
+        ircConnection.setDaemon(false);
+        ircConnection.setColors(true);
     }
 
     /**
@@ -77,7 +78,7 @@ public class KrazipIRCPublisher implements Publisher {
      * @return <code>String</code> as a body of IRC message
      * @throws CruiseControlException on any error
      */
-    protected String buildMessage(Element cruiseControlBuildLog) throws CruiseControlException {
+    protected final String buildMessage(Element cruiseControlBuildLog) throws CruiseControlException {
         XMLLogHelper ccBuildLog = new XMLLogHelper(cruiseControlBuildLog);
         String msg = "";
         if (ccBuildLog.isBuildSuccessful()) {
@@ -89,13 +90,17 @@ public class KrazipIRCPublisher implements Publisher {
             msg += "Includes changes by ";
             Set changeSet = ccBuildLog.getBuildParticipants();
             Iterator iter = changeSet.iterator();
+            StringBuilder sb = new StringBuilder();
             while (iter.hasNext()) {
-                String modname = (String) iter.next();
-                msg += modname;
+                //String modname = (String) iter.next();
+                //msg += modname;
+                sb.append((String) iter.next());
                 if (iter.hasNext()) {
-                    msg += ", ";
+                    //msg += ", ";
+                    sb.append(", ");
                 }
             }
+            msg += sb.toString();
         }
         msg += ". Please see more details at " + getResultURL(ccBuildLog);
         return msg;
@@ -107,7 +112,7 @@ public class KrazipIRCPublisher implements Publisher {
      * @param ccBuildLog <code>XMLLogHelper</code> wrapper for the build log
      * @return <code>String</code> as a URL for build log.
      */
-    protected String getResultURL(XMLLogHelper ccBuildLog) {
+    protected final String getResultURL(XMLLogHelper ccBuildLog) {
         String logFileName = "";
         try {
             logFileName = ccBuildLog.getLogFileName();
@@ -117,12 +122,12 @@ public class KrazipIRCPublisher implements Publisher {
         String baseLogFileName =
                 logFileName.substring(
                         logFileName.lastIndexOf(File.separator) + 1,
-                        logFileName.lastIndexOf("."));
+                        logFileName.lastIndexOf('.'));
 
         StringBuffer str = new StringBuffer();
         str.append(getResultURL());
 
-        if (resultURL.indexOf("?") == -1) {
+        if (resultURL.indexOf('?') == -1) {
             str.append("?");
         } else {
             str.append("&");
@@ -139,7 +144,7 @@ public class KrazipIRCPublisher implements Publisher {
      *
      *  @throws CruiseControlException if there was a configuration error.
      */
-    public void validate() throws CruiseControlException {
+    public final void validate() throws CruiseControlException {
         ValidationHelper.assertIsSet(host, "host", this.getClass());
         ValidationHelper.assertIsSet(nickName, "nickName", this.getClass());
         ValidationHelper.assertIsSet(userName, "userName", this.getClass());
@@ -148,59 +153,59 @@ public class KrazipIRCPublisher implements Publisher {
     }
 
 
-    public String getChannel() {
+    public final String getChannel() {
         return channel;
     }
 
-    public void setChannel(String channel) {
+    public final void setChannel(String channel) {
         this.channel = channel;
     }
 
-    public String getHost() {
+    public final String getHost() {
         return host;
     }
 
-    public void setHost(String host) {
+    public final void setHost(String host) {
         this.host = host;
     }
 
-    public String getNickName() {
+    public final String getNickName() {
         return nickName;
     }
 
-    public void setNickName(String nickName) {
+    public final void setNickName(String nickName) {
         this.nickName = nickName;
     }
 
-    public int getPort() {
+    public final int getPort() {
         return port;
     }
 
-    public void setPort(int port) {
+    public final void setPort(int port) {
         this.port = port;
     }
 
-    public String getUserName() {
+    public final String getUserName() {
         return userName;
     }
 
-    public void setUserName(String userName) {
+    public final void setUserName(String userName) {
         this.userName = userName;
     }
 
-    public String getRealName() {
+    public final String getRealName() {
         return realName;
     }
 
-    public void setRealName(String realName) {
+    public final void setRealName(String realName) {
         this.realName = realName;
     }
 
-    public String getResultURL() {
+    public final String getResultURL() {
         return resultURL;
     }
 
-    public void setResultURL(String resultURL) {
+    public final void setResultURL(String resultURL) {
         this.resultURL = resultURL;
     }
 
@@ -218,79 +223,79 @@ public class KrazipIRCPublisher implements Publisher {
      * </p>
      *
      */
-    public class Listener implements IRCEventListener {
+    public final static class Listener implements IRCEventListener {
 
-        public void onDisconnected() {
+        public final void onDisconnected() {
             LOG.info("Disconnected");
         }
 
-        public void onError(String msg) {
+        public final void onError(String msg) {
             LOG.warn("Error: " + msg);
         }
 
-        public void onError(int num, String msg) {
+        public final void onError(int num, String msg) {
             LOG.warn("Error: " + num + " : " + msg);
         }
 
-        public void onInvite(String chan, IRCUser user, String passiveNick) {
+        public final void onInvite(String chan, IRCUser user, String passiveNick) {
             LOG.info("Invite: " + chan + " from " + user);
         }
 
-        public void onJoin(String chan, IRCUser user) {
+        public final void onJoin(String chan, IRCUser user) {
             LOG.info("Join: " + chan);
         }
 
-        public void onKick(String chan, IRCUser user, String passiveNick,
+        public final void onKick(String chan, IRCUser user, String passiveNick,
                            String msg) {
             LOG.info("Kick: " + chan + ": " + user + " (" + msg + ")");
         }
 
-        public void onMode(String chan, IRCUser user, IRCModeParser modeParser) {
+        public final void onMode(String chan, IRCUser user, IRCModeParser modeParser) {
             LOG.info("Mode " + modeParser.getLine() + " (" + user + "@" + chan
                     + ")");
         }
 
-        public void onMode(IRCUser user, String passiveNick, String mode) {
+        public final void onMode(IRCUser user, String passiveNick, String mode) {
             LOG.info("Mode: " + mode + " (" + user + ")");
         }
 
-        public void onNick(IRCUser user, String newNick) {
+        public final void onNick(IRCUser user, String newNick) {
             LOG.info("Nickname change:" + user + ": " + newNick);
         }
 
-        public void onNotice(String target, IRCUser user, String msg) {
+        public final void onNotice(String target, IRCUser user, String msg) {
             LOG.info("Notice: " + target + " " + user + ": " + msg);
         }
 
-        public void onPart(String chan, IRCUser user, String msg) {
+        public final void onPart(String chan, IRCUser user, String msg) {
             LOG.info("Part: " + chan + " " + user + " " + msg);
         }
 
-        public void onPing(String ping) {
+        public final void onPing(String ping) {
             LOG.info("Ping");
         }
 
-        public void onPrivmsg(String target, IRCUser user, String msg) {
+        public final void onPrivmsg(String target, IRCUser user, String msg) {
             LOG.info("Private Message: " + target + " " + user + " " + msg);
         }
 
-        public void onQuit(IRCUser user, String msg) {
+        public final void onQuit(IRCUser user, String msg) {
             LOG.info("Quite: " + user + " " + msg);
         }
 
-        public void onRegistered() {
+        public final void onRegistered() {
             LOG.info("Registered");
         }
 
-        public void onReply(int num, String value, String msg) {
+        public final void onReply(int num, String value, String msg) {
             LOG.info("Reply: " + num + " " + value + " " + msg);
         }
 
-        public void onTopic(String chan, IRCUser user, String topic) {
+        public final void onTopic(String chan, IRCUser user, String topic) {
             LOG.info("Topic: " + chan + " " + user + " " + topic);
         }
 
-        public void unknown(String prefix, String command, String middle,
+        public final void unknown(String prefix, String command, String middle,
                             String trailing) {
             LOG.warn("Unknown: " + command);
         }

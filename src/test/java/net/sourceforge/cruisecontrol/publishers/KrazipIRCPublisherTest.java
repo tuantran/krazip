@@ -22,10 +22,26 @@ public class KrazipIRCPublisherTest {
         publisher.setChannel("#someChannel");
         publisher.setResultURL("http://www.someurl.com/someProjectName");
         KrazipIRCPublisherTest publisherTest = new KrazipIRCPublisherTest();
-        Element cruiseControlBuildLog = publisherTest.createcruiseControlBuildLog();
+        Element cruiseControlBuildLog = publisherTest.createcruiseControlBuildLog(true);
         Assert.assertEquals
                 ("Build completed successfully for project \"someProjectname\". " +
                         "Please see more details at http://www.someurl.com/someProjectName?log=log123456789",
+                        publisher.buildMessage(cruiseControlBuildLog));
+    }
+
+    @Test
+    public void testBuildFailMessage() throws Exception {
+        publisher = new KrazipIRCPublisher();
+        publisher.setHost("irc.somehost.com");
+        publisher.setChannel("#someChannel");
+        publisher.setResultURL("http://www.someurl.com/someProjectName");
+        KrazipIRCPublisherTest publisherTest = new KrazipIRCPublisherTest();
+        Element cruiseControlBuildLog = publisherTest.createcruiseControlBuildLog(false);
+        System.out.println("testBuildFailMessage : "+ publisher.buildMessage(cruiseControlBuildLog) );
+        Assert.assertEquals
+                ("Build FAILURE for project \"someProjectname\". Includes changes by someEmail@someHost.com, " +
+                        "someEmail2@someHost.com. Please see more details at " +
+                        "http://www.someurl.com/someProjectName?log=log123456789",
                         publisher.buildMessage(cruiseControlBuildLog));
     }
 
@@ -102,8 +118,33 @@ public class KrazipIRCPublisherTest {
         Assert.assertEquals("http://www.someurl.com/", publisher.getResultURL());
     }
 
-    protected Element createcruiseControlBuildLog(){
-        Element createcruiseControlBuildLog = new Element("cruisecontrol");
+    protected Element createcruiseControlBuildLog(boolean buildPass){
+
+        // START: building modifications element
+        Element modifications = new Element("modifications");
+
+        Element modification = new Element("modification");
+        Element userElement = new Element("user");
+        userElement.addContent("someUser");
+        Element emailElement = new Element("email");
+        emailElement.addContent("someEmail@someHost.com");
+
+        Element modification2 = new Element("modification");
+        Element userElement2 = new Element("user");
+        userElement2.addContent("someUser2");
+        Element emailElement2 = new Element("email");
+        emailElement2.addContent("someEmail2@someHost.com");
+
+        modification.addContent(userElement);
+        modification.addContent(emailElement);
+        modification2.addContent(userElement2);
+        modification2.addContent(emailElement2);
+
+        modifications.addContent(modification);
+        modifications.addContent(modification2);
+        // END: building modifications element
+
+        // START: building 'info' element
         Element infoElement = new Element("info");
 
         Element logFileElement = new Element("property");
@@ -114,12 +155,30 @@ public class KrazipIRCPublisherTest {
         projNameElement.setAttribute("name", "projectname");
         projNameElement.setAttribute("value", "someProjectname");
 
+        Element lastsuccessfulbuild = new Element("property");
+        lastsuccessfulbuild.setAttribute("name", "lastsuccessfulbuild");
+        lastsuccessfulbuild.setAttribute("value", "20101027155629");
+
+        Element lastbuildsuccessful = new Element("property");
+        lastbuildsuccessful.setAttribute("name", "lastbuildsuccessful");
+        lastbuildsuccessful.setAttribute("value", "true");
+
+        infoElement.addContent(lastbuildsuccessful);
+        infoElement.addContent(lastsuccessfulbuild);
         infoElement.addContent(projNameElement);
         infoElement.addContent(logFileElement);
+        // END: building 'info' element
 
-        createcruiseControlBuildLog.addContent(infoElement);
-        
+        // START: building build element
         Element buildElement = new Element("build");
+        if (!buildPass){
+             buildElement.setAttribute("error","true");
+        }
+        // END: building build element
+
+        Element createcruiseControlBuildLog = new Element("cruisecontrol");
+        createcruiseControlBuildLog.addContent(modifications);
+        createcruiseControlBuildLog.addContent(infoElement);
         createcruiseControlBuildLog.addContent(buildElement);
 
         return createcruiseControlBuildLog;
