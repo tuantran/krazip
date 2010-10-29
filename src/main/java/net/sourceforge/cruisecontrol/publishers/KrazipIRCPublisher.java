@@ -223,79 +223,79 @@ public class KrazipIRCPublisher implements Publisher {
      * </p>
      *
      */
-    public final static class Listener implements IRCEventListener {
+    public static final class Listener implements IRCEventListener {
 
-        public final void onDisconnected() {
+        public void onDisconnected() {
             LOG.info("Disconnected");
         }
 
-        public final void onError(String msg) {
+        public void onError(String msg) {
             LOG.warn("Error: " + msg);
         }
 
-        public final void onError(int num, String msg) {
+        public void onError(int num, String msg) {
             LOG.warn("Error: " + num + " : " + msg);
         }
 
-        public final void onInvite(String chan, IRCUser user, String passiveNick) {
+        public void onInvite(String chan, IRCUser user, String passiveNick) {
             LOG.info("Invite: " + chan + " from " + user);
         }
 
-        public final void onJoin(String chan, IRCUser user) {
+        public void onJoin(String chan, IRCUser user) {
             LOG.info("Join: " + chan);
         }
 
-        public final void onKick(String chan, IRCUser user, String passiveNick,
+        public void onKick(String chan, IRCUser user, String passiveNick,
                            String msg) {
             LOG.info("Kick: " + chan + ": " + user + " (" + msg + ")");
         }
 
-        public final void onMode(String chan, IRCUser user, IRCModeParser modeParser) {
+        public void onMode(String chan, IRCUser user, IRCModeParser modeParser) {
             LOG.info("Mode " + modeParser.getLine() + " (" + user + "@" + chan
                     + ")");
         }
 
-        public final void onMode(IRCUser user, String passiveNick, String mode) {
+        public void onMode(IRCUser user, String passiveNick, String mode) {
             LOG.info("Mode: " + mode + " (" + user + ")");
         }
 
-        public final void onNick(IRCUser user, String newNick) {
+        public void onNick(IRCUser user, String newNick) {
             LOG.info("Nickname change:" + user + ": " + newNick);
         }
 
-        public final void onNotice(String target, IRCUser user, String msg) {
+        public void onNotice(String target, IRCUser user, String msg) {
             LOG.info("Notice: " + target + " " + user + ": " + msg);
         }
 
-        public final void onPart(String chan, IRCUser user, String msg) {
+        public void onPart(String chan, IRCUser user, String msg) {
             LOG.info("Part: " + chan + " " + user + " " + msg);
         }
 
-        public final void onPing(String ping) {
+        public void onPing(String ping) {
             LOG.info("Ping");
         }
 
-        public final void onPrivmsg(String target, IRCUser user, String msg) {
+        public void onPrivmsg(String target, IRCUser user, String msg) {
             LOG.info("Private Message: " + target + " " + user + " " + msg);
         }
 
-        public final void onQuit(IRCUser user, String msg) {
+        public void onQuit(IRCUser user, String msg) {
             LOG.info("Quite: " + user + " " + msg);
         }
 
-        public final void onRegistered() {
+        public void onRegistered() {
             LOG.info("Registered");
         }
 
-        public final void onReply(int num, String value, String msg) {
+        public void onReply(int num, String value, String msg) {
             LOG.info("Reply: " + num + " " + value + " " + msg);
         }
 
-        public final void onTopic(String chan, IRCUser user, String topic) {
+        public void onTopic(String chan, IRCUser user, String topic) {
             LOG.info("Topic: " + chan + " " + user + " " + topic);
         }
 
-        public final void unknown(String prefix, String command, String middle,
+        public void unknown(String prefix, String command, String middle,
                             String trailing) {
             LOG.warn("Unknown: " + command);
         }
