@@ -36,6 +36,7 @@ public class KrazipIRCPublisher implements Publisher {
     private String realName = "Krazip CruiseControl IRC publisher";
     private String channel;
     private String resultURL;
+    private static final int DEFAULT_IRC_PORT = 6667;
 
     /**
      * The main method for publishing build result into IRC. Firstly, initialize an IRC connection,
