@@ -9,6 +9,22 @@
     <version>1.2-SNAPSHOT</version>
     <name>krazip</name>
 
+
+    <distributionManagement>
+        <!--<repository>
+            <id>api-repository</id>
+            <name>API Repository</name>
+            <url>
+                scp://maven.api.no/usr/local/maven/repository
+            </url>
+        </repository>-->
+        <site>
+            <id>ci.website</id>
+            <name>ci.dev.api.no</name>
+            <url>file:///var/www/snapshot/${project.name}</url>
+        </site>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.schwering</groupId>
