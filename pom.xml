@@ -19,8 +19,8 @@
             </url>
         </repository>-->
         <site>
-            <id>ci.website</id>
-            <name>ci.dev.api.no</name>
+            <id>apdm.website</id>
+            <name>apdm.website</name>
             <url>file:///var/www/snapshot/${project.name}</url>
         </site>
     </distributionManagement>
