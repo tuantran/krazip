@@ -21,7 +21,7 @@
         <site>
             <id>apdm.website</id>
             <name>apdm.website</name>
-            <url>file:///var/www/snapshot/${project.name}</url>
+            <url>file:///var/www/snapshot/krazip</url>
         </site>
     </distributionManagement>
 
