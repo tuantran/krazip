@@ -1,4 +1,6 @@
 package net.sourceforge.cruisecontrol.publishers;
+// This class will always generate a sonar findbugs error as it is not serializable.
+// This has been approved by Erlend as OK.
 
 import net.sourceforge.cruisecontrol.CruiseControlException;
 import net.sourceforge.cruisecontrol.Publisher;
@@ -22,11 +24,11 @@ import java.util.Set;
  *
  * @author Pongvech Vechprasit (pun@abctech-thailand.com)
  */
-
+@SuppressWarnings("SE_BAD_FIELD")
 public class KrazipIRCPublisher implements Publisher {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger(KrazipIRCPublisher.class);
+    private static final Logger log = Logger.getLogger(KrazipIRCPublisher.class);
     private static final int DEFAULT_IRC_PORT = 6667;
     private IRCConnection ircConnection;
     private String host;
@@ -51,7 +53,7 @@ public class KrazipIRCPublisher implements Publisher {
         try {
             ircConnection.connect();
         } catch (IOException ioe) {
-            LOG.error("Error: Could not connect to IRC server", ioe);
+            log.error("Error: Could not connect to IRC server", ioe);
         }
         ircConnection.doJoin(channel);
         String message = buildMessage(cruiseControlBuildLog);
@@ -117,7 +119,7 @@ public class KrazipIRCPublisher implements Publisher {
         try {
             logFileName = ccBuildLog.getLogFileName();
         } catch (CruiseControlException e) {
-            LOG.error("Error: Could not get log file name", e);
+            log.error("Error: Could not get log file name", e);
         }
         String baseLogFileName =
                 logFileName.substring(
@@ -226,78 +228,78 @@ public class KrazipIRCPublisher implements Publisher {
     public static final class Listener implements IRCEventListener {
 
         public void onDisconnected() {
-            LOG.info("Disconnected");
+            log.info("Disconnected");
         }
 
         public void onError(String msg) {
-            LOG.warn("Error: " + msg);
+            log.warn("Error: " + msg);
         }
 
         public void onError(int num, String msg) {
-            LOG.warn("Error: " + num + " : " + msg);
+            log.warn("Error: " + num + " : " + msg);
         }
 
         public void onInvite(String chan, IRCUser user, String passiveNick) {
-            LOG.info("Invite: " + chan + " from " + user);
+            log.info("Invite: " + chan + " from " + user);
         }
 
         public void onJoin(String chan, IRCUser user) {
-            LOG.info("Join: " + chan);
+            log.info("Join: " + chan);
         }
 
         public void onKick(String chan, IRCUser user, String passiveNick,
                            String msg) {
-            LOG.info("Kick: " + chan + ": " + user + " (" + msg + ")");
+            log.info("Kick: " + chan + ": " + user + " (" + msg + ")");
         }
 
         public void onMode(String chan, IRCUser user, IRCModeParser modeParser) {
-            LOG.info("Mode " + modeParser.getLine() + " (" + user + "@" + chan
+            log.info("Mode " + modeParser.getLine() + " (" + user + "@" + chan
                     + ")");
         }
 
         public void onMode(IRCUser user, String passiveNick, String mode) {
-            LOG.info("Mode: " + mode + " (" + user + ")");
+            log.info("Mode: " + mode + " (" + user + ")");
         }
 
         public void onNick(IRCUser user, String newNick) {
-            LOG.info("Nickname change:" + user + ": " + newNick);
+            log.info("Nickname change:" + user + ": " + newNick);
         }
 
         public void onNotice(String target, IRCUser user, String msg) {
-            LOG.info("Notice: " + target + " " + user + ": " + msg);
+            log.info("Notice: " + target + " " + user + ": " + msg);
         }
 
         public void onPart(String chan, IRCUser user, String msg) {
-            LOG.info("Part: " + chan + " " + user + " " + msg);
+            log.info("Part: " + chan + " " + user + " " + msg);
         }
 
         public void onPing(String ping) {
-            LOG.info("Ping");
+            log.info("Ping");
         }
 
         public void onPrivmsg(String target, IRCUser user, String msg) {
-            LOG.info("Private Message: " + target + " " + user + " " + msg);
+            log.info("Private Message: " + target + " " + user + " " + msg);
         }
 
         public void onQuit(IRCUser user, String msg) {
-            LOG.info("Quite: " + user + " " + msg);
+            log.info("Quite: " + user + " " + msg);
         }
 
         public void onRegistered() {
-            LOG.info("Registered");
+            log.info("Registered");
         }
 
         public void onReply(int num, String value, String msg) {
-            LOG.info("Reply: " + num + " " + value + " " + msg);
+            log.info("Reply: " + num + " " + value + " " + msg);
         }
 
         public void onTopic(String chan, IRCUser user, String topic) {
-            LOG.info("Topic: " + chan + " " + user + " " + topic);
+            log.info("Topic: " + chan + " " + user + " " + topic);
         }
 
         public void unknown(String prefix, String command, String middle,
                             String trailing) {
-            LOG.warn("Unknown: " + command);
+            log.warn("Unknown: " + command);
         }
 
     }
