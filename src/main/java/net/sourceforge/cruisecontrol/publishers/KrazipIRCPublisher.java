@@ -24,7 +24,7 @@ import java.util.Set;
  *
  * @author Pongvech Vechprasit (pun@abctech-thailand.com)
  */
-@SuppressWarnings("SE_BAD_FIELD")
+@SuppressWarnings("findbugs.SE_BAD_FIELD")
 public class KrazipIRCPublisher implements Publisher {
 
     private static final long serialVersionUID = 1L;
