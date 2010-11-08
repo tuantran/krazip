@@ -13,6 +13,7 @@ import org.schwering.irc.lib.IRCEventListener;
 import org.schwering.irc.lib.IRCModeParser;
 import org.schwering.irc.lib.IRCUser;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -24,7 +25,7 @@ import java.util.Set;
  *
  * @author Pongvech Vechprasit (pun@abctech-thailand.com)
  */
-@SuppressWarnings("findbugs.SE_BAD_FIELD")
+@edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_BAD_FIELD")
 public class KrazipIRCPublisher implements Publisher {
 
     private static final long serialVersionUID = 1L;

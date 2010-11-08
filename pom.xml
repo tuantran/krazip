@@ -55,6 +55,18 @@
             <version>4.8.2</version>
             <scope>test</scope>
         </dependency>
+        <!-- Do not think we need the jsr305 just to disable findbugs warnings 
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>1.3.9</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>findbugs</artifactId>
+            <version>1.3.9</version>
+        </dependency>
     </dependencies>
     
     <build>
