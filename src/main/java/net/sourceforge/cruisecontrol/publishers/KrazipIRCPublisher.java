@@ -11,10 +11,11 @@ import org.schwering.irc.lib.IRCEventListener;
 import org.schwering.irc.lib.IRCModeParser;
 import org.schwering.irc.lib.IRCUser;
 
-
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -26,7 +27,7 @@ import java.util.Set;
 
 // This class will always generate a sonar findbugs error as it is not serializable.
 // This has been approved by Erlend as OK
-    
+
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_BAD_FIELD")
 public class KrazipIRCPublisher implements Publisher {
 
@@ -35,12 +36,13 @@ public class KrazipIRCPublisher implements Publisher {
     private static final int DEFAULT_IRC_PORT = 6667;
     private static IRCConnection ircConnection;
     private static boolean connected = false;
+    private static List<BuildResult> buildList = new ArrayList<BuildResult>();
     private int port = DEFAULT_IRC_PORT;
     private String host;
     private String nickName = "Krazip";
     private String userName = "Krazip";
     private String realName = "Krazip CruiseControl IRC publisher";
-    private String channel;
+    private static String channel;
     private String resultURL;
     private String loggingLevel = "fail"; // pass, fail(including fixed), off
     private String buildResult;
@@ -59,8 +61,6 @@ public class KrazipIRCPublisher implements Publisher {
         initConnection();
         sendMessage(cruiseControlBuildLog);
 
-        // TODO : Will be quit "on demand" instead...
-        //ircConnection.doQuit();
     }
 
     /**
@@ -125,7 +125,7 @@ public class KrazipIRCPublisher implements Publisher {
         String msg = "";
         if (ccBuildLog.isBuildSuccessful()) {
             buildResult = "pass";
-            msg += "\"" + projectName + "\" build completed successfully";
+            msg += "\"" + projectName + "\" build completed successfully.";
         } else if (ccBuildLog.isBuildFix()) {
             buildResult = "fixed";
             msg += "\"" + projectName + "\" build fixed.";
@@ -133,18 +133,22 @@ public class KrazipIRCPublisher implements Publisher {
             buildResult = "fail";
             msg += "\"" + projectName + "\" build failed. ";
             msg += "Includes changes by ";
-            Set changeSet = ccBuildLog.getBuildParticipants();
-            Iterator iter = changeSet.iterator();
+            Set<String> changeSet = ccBuildLog.getBuildParticipants();
+            Iterator<String> iter = changeSet.iterator();
             StringBuilder sb = new StringBuilder();
             while (iter.hasNext()) {
-                sb.append((String) iter.next());
+                sb.append(iter.next());
                 if (iter.hasNext()) {
                     sb.append(", ");
                 }
             }
             msg += sb.toString();
         }
-        msg += ". (" + getResultURL(ccBuildLog) + ")";
+        if (!buildResult.equals("pass")) {
+            msg += ". (" + getResultURL(ccBuildLog) + ")";
+        }
+        buildList.add(new BuildResult(projectName, msg, buildTimeStamp));
+        log.info("buildResult added to buildList, Total item : " + buildList.size());
         return msg;
     }
 
@@ -270,9 +274,9 @@ public class KrazipIRCPublisher implements Publisher {
 
     /**
      * Implementation of IRCEventListener
-     *
+     * <p/>
      * <i>Quote from <code>org.schwering.irc.lib.IRCEventListener</code></i>
-     *
+     * <p/>
      * Used as listener for incoming events like messages.
      * <p>
      * The <code>IRCEventListener</code> is used by the
@@ -280,7 +284,6 @@ public class KrazipIRCPublisher implements Publisher {
      * a listener which listens to the connection for incoming IRC events like
      * <code>PRIVMSG</code>s or numeric replies...
      * </p>
-     *
      */
     public static final class Listener implements IRCEventListener {
 
@@ -336,6 +339,11 @@ public class KrazipIRCPublisher implements Publisher {
 
         public void onPrivmsg(String target, IRCUser user, String msg) {
             log.info("Private Message: " + target + " " + user + " " + msg);
+            if (!target.trim().equalsIgnoreCase("krazip")) {
+                responsePrivateMessage(user.toString(), msg, true);
+            } else {
+                responsePrivateMessage(user.toString(), msg, false);
+            }
         }
 
         public void onQuit(IRCUser user, String msg) {
@@ -357,6 +365,106 @@ public class KrazipIRCPublisher implements Publisher {
         public void unknown(String prefix, String command, String middle,
                             String trailing) {
             log.warn("Unknown: " + command);
+        }
+
+    }
+
+    public static void responsePrivateMessage(String sender, String msg, boolean shout) {
+
+        String[] msgTmp = msg.split(" ");
+        String scope;
+        if (shout) { // Public message
+            scope = channel;
+            if (msgTmp.length == 2) {
+                if (msgTmp[0].trim().equalsIgnoreCase("krazip")) {
+                    log.info("Krazip command passed(shout) : " + msgTmp[0] + " and " + msgTmp[1]);
+                    if (msgTmp[1].trim().equalsIgnoreCase("help")) {
+                        sendHelp(scope);
+                    } else {
+                        sendMessage(getLastBuild(buildList, msgTmp[1]), msgTmp[1], scope);
+                    }
+                }
+            }
+        } else { // Private message
+            scope = sender;
+            if (msgTmp.length == 1) {
+                log.info("Krazip command passed(private) : " + msgTmp[0]);
+                if (msgTmp[0].trim().equalsIgnoreCase("help")) {
+                    sendHelp(scope);
+                } else {
+                    sendMessage(getLastBuild(buildList, msgTmp[0]), msgTmp[0], scope);
+                }
+            }
+        }
+
+    }
+
+    public static void sendMessage(BuildResult buildResult, String requestedProjectName, String scope) {
+        if (buildResult != null && buildResult.getMessage() != null) {
+            // Send response message to IRC
+            ircConnection.doPrivmsg(scope, buildResult.getMessage());
+        } else {
+            // Requested projectName not found in ArrayList
+            ircConnection.doPrivmsg(scope, "Project name \"" + requestedProjectName + "\" not found or it haven't been built" +
+                    " since CruiseControl last re-started");
+        }
+    }
+    // TODO : I think I could merge sendMessage and sendHelp together...so we minimize the usage of ircConnection
+    public static void sendHelp(String scope) {
+        String helpMessage = "Usage : krazip [projectName] To display last build result for specified project, [help] To display this message";
+        ircConnection.doPrivmsg(scope, helpMessage);
+
+    }
+
+    public static BuildResult getLastBuild(List<BuildResult> buildList, String projectName) {
+
+        BuildResult result = new BuildResult();
+        for (int i = buildList.size() - 1; i > -1; i--) {
+            if (buildList.get(i).getProjectName().trim().equalsIgnoreCase(projectName.trim())) {
+                result = buildList.get(i);
+                break;
+            }
+        }
+        return result;
+    }
+
+    public static class BuildResult {
+        private String projectName;
+        private String message;
+        private String timeStamp;
+
+        public BuildResult() {
+
+        }
+
+        public BuildResult(String projectName, String message, String timeStamp) {
+            this.projectName = projectName;
+            this.message = message;
+            this.timeStamp = timeStamp;
+        }
+
+        public final String getProjectName() {
+            return projectName;
+        }
+
+        public final void setProjectName(String projectName) {
+            this.projectName = projectName;
+        }
+
+        public final String getTimeStamp() {
+            return timeStamp;
+        }
+
+        public final void setTimeStamp(String timeStamp) {
+            this.timeStamp = timeStamp;
+        }
+
+        public final String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
         }
 
     }

@@ -24,8 +24,7 @@ public class KrazipIRCPublisherTest {
         KrazipIRCPublisherTest publisherTest = new KrazipIRCPublisherTest();
         Element cruiseControlBuildLog = publisherTest.createcruiseControlBuildLog(true);
         Assert.assertEquals
-                ("\"someProjectname\" build completed successfully. " +
-                        "(http://www.someurl.com/someProjectName?log=log123456789)",
+                ("\"someProjectname\" build completed successfully." ,
                         publisher.buildMessage(cruiseControlBuildLog));
     }
 
