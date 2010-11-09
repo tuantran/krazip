@@ -34,6 +34,9 @@ public class KrazipIRCPublisher implements Publisher {
     private static final long serialVersionUID = 1L;
     private static final Logger log = Logger.getLogger(KrazipIRCPublisher.class);
     private static final int DEFAULT_IRC_PORT = 6667;
+    private static final String PASS = "pass";
+    private static final String FIXED = "fixed";
+    private static final String FAIL = "fail";
     private static IRCConnection ircConnection;
     private static boolean connected = false;
     private static List<BuildResult> buildList = new ArrayList<BuildResult>();
@@ -44,7 +47,7 @@ public class KrazipIRCPublisher implements Publisher {
     private String realName = "Krazip CruiseControl IRC publisher";
     private static String channel;
     private String resultURL;
-    private String loggingLevel = "fail"; // pass, fail(including fixed), off
+    private String loggingLevel = FAIL; // pass, fail(including fixed), off
     private String buildResult;
 
 
@@ -94,12 +97,12 @@ public class KrazipIRCPublisher implements Publisher {
         String message = buildMessage(cruiseControlBuildLog);
 
         if (buildResult != null && loggingLevel != null) {
-            if (loggingLevel.trim().equalsIgnoreCase("pass")) {
+            if (loggingLevel.trim().equalsIgnoreCase(PASS)) {
                 log.info("Logging level: \"pass\" sending build result to IRC server...");
                 KrazipIRCPublisher.ircConnection.doPrivmsg(channel, message);
-            } else if (loggingLevel.trim().equalsIgnoreCase("fail")) {
+            } else if (loggingLevel.trim().equalsIgnoreCase(FAIL)) {
                 log.info("Logging level: \"fail\" sending only fail and fixed result to IRC server...");
-                if (buildResult.equals("fixed") || buildResult.equals("fail")) {
+                if (buildResult.equals(FIXED) || buildResult.equals("fail")) {
                     KrazipIRCPublisher.ircConnection.doPrivmsg(channel, message);
                 }
             } else {
@@ -124,13 +127,13 @@ public class KrazipIRCPublisher implements Publisher {
         String buildTimeStamp = ccBuildLog.getBuildTimestamp();
         String msg = "";
         if (ccBuildLog.isBuildSuccessful()) {
-            buildResult = "pass";
+            buildResult = PASS;
             msg += "\"" + projectName + "\" build completed successfully.";
         } else if (ccBuildLog.isBuildFix()) {
-            buildResult = "fixed";
+            buildResult = FIXED;
             msg += "\"" + projectName + "\" build fixed.";
         } else {
-            buildResult = "fail";
+            buildResult = FAIL;
             msg += "\"" + projectName + "\" build failed. ";
             msg += "Includes changes by ";
             Set<String> changeSet = ccBuildLog.getBuildParticipants();
@@ -144,7 +147,7 @@ public class KrazipIRCPublisher implements Publisher {
             }
             msg += sb.toString();
         }
-        if (!buildResult.equals("pass")) {
+        if (!buildResult.equals(PASS)) {
             msg += ". (" + getResultURL(ccBuildLog) + ")";
         }
         buildList.add(new BuildResult(projectName, msg, buildTimeStamp));
