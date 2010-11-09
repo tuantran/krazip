@@ -11,6 +11,7 @@ import org.schwering.irc.lib.IRCEventListener;
 import org.schwering.irc.lib.IRCModeParser;
 import org.schwering.irc.lib.IRCUser;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -22,6 +23,10 @@ import java.util.Set;
  *
  * @author Pongvech Vechprasit (pun@abctech-thailand.com)
  */
+
+// This class will always generate a sonar findbugs error as it is not serializable.
+// This has been approved by Erlend as OK
+    
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_BAD_FIELD")
 public class KrazipIRCPublisher implements Publisher {
 
@@ -39,6 +44,7 @@ public class KrazipIRCPublisher implements Publisher {
     private String resultURL;
     private String loggingLevel = "fail"; // pass, fail(including fixed), off
     private String buildResult;
+
 
     /**
      * The main method for publishing build result into IRC. Firstly, initialize an IRC connection,
@@ -71,11 +77,11 @@ public class KrazipIRCPublisher implements Publisher {
             try {
                 ircConnection.connect();
             } catch (IOException ioe) {
-                LOG.error("Error: Could not connect to IRC server", ioe);
+                log.error("Error: Could not connect to IRC server", ioe);
             }
             ircConnection.doJoin(channel);
-            LOG.info("Connected to IRC server");
-            LOG.info("Joined channel: " + channel);
+            log.info("Connected to IRC server");
+            log.info("Joined channel: " + channel);
             connected = true;
         }
 
@@ -89,18 +95,18 @@ public class KrazipIRCPublisher implements Publisher {
 
         if (buildResult != null && loggingLevel != null) {
             if (loggingLevel.trim().equalsIgnoreCase("pass")) {
-                LOG.info("Logging level: \"pass\" sending build result to IRC server...");
+                log.info("Logging level: \"pass\" sending build result to IRC server...");
                 ircConnection.doPrivmsg(channel, message);
             } else if (loggingLevel.trim().equalsIgnoreCase("fail")) {
-                LOG.info("Logging level: \"fail\" sending only fail and fixed result to IRC server...");
+                log.info("Logging level: \"fail\" sending only fail and fixed result to IRC server...");
                 if (buildResult.equals("fixed") || buildResult.equals("fail")) {
                     ircConnection.doPrivmsg(channel, message);
                 }
             } else {
-                LOG.info("Logging level: \"off\" not sending any build result to IRC server...");
+                log.info("Logging level: \"off\" not sending any build result to IRC server...");
             }
         } else {
-            LOG.error("Error: Could not retrieve buildResult or loggingLevel info");
+            log.error("Error: Could not retrieve buildResult or loggingLevel info");
         }
     }
 
@@ -264,7 +270,7 @@ public class KrazipIRCPublisher implements Publisher {
 
     /**
      * Implementation of IRCEventListener
-     * 
+     *
      * <i>Quote from <code>org.schwering.irc.lib.IRCEventListener</code></i>
      *
      * Used as listener for incoming events like messages.
