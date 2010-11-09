@@ -375,19 +375,20 @@ public class KrazipIRCPublisher implements Publisher {
         String scope;
         if (shout) { // Public message
             scope = channel;
-            if (msgTmp.length == 2) {
-                if (msgTmp[0].trim().equalsIgnoreCase("krazip")) {
+            if (msgTmp.length == 2 && msgTmp[0].trim().equalsIgnoreCase("krazip")) {
+
                     log.info("Krazip command passed(shout) : " + msgTmp[0] + " and " + msgTmp[1]);
                     if (msgTmp[1].trim().equalsIgnoreCase("help")) {
                         sendHelp(scope);
                     } else {
                         sendMessage(getLastBuild(buildList, msgTmp[1]), msgTmp[1], scope);
                     }
-                }
+
             }
         } else { // Private message
             scope = sender;
             if (msgTmp.length == 1) {
+                
                 log.info("Krazip command passed(private) : " + msgTmp[0]);
                 if (msgTmp[0].trim().equalsIgnoreCase("help")) {
                     sendHelp(scope);
