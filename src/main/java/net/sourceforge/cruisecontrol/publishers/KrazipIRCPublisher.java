@@ -1,6 +1,4 @@
 package net.sourceforge.cruisecontrol.publishers;
-// This class will always generate a sonar findbugs error as it is not serializable.
-// This has been approved by Erlend as OK.
 
 import net.sourceforge.cruisecontrol.CruiseControlException;
 import net.sourceforge.cruisecontrol.Publisher;
@@ -12,7 +10,6 @@ import org.schwering.irc.lib.IRCConnection;
 import org.schwering.irc.lib.IRCEventListener;
 import org.schwering.irc.lib.IRCModeParser;
 import org.schwering.irc.lib.IRCUser;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -31,47 +28,80 @@ public class KrazipIRCPublisher implements Publisher {
     private static final long serialVersionUID = 1L;
     private static final Logger log = Logger.getLogger(KrazipIRCPublisher.class);
     private static final int DEFAULT_IRC_PORT = 6667;
-    private IRCConnection ircConnection;
-    private String host;
+    private static IRCConnection ircConnection;
+    private static boolean connected = false;
     private int port = DEFAULT_IRC_PORT;
+    private String host;
     private String nickName = "Krazip";
     private String userName = "Krazip";
     private String realName = "Krazip CruiseControl IRC publisher";
     private String channel;
     private String resultURL;
+    private String loggingLevel = "fail"; // pass, fail(including fixed), off
+    private String buildResult;
 
     /**
      * The main method for publishing build result into IRC. Firstly, initialize an IRC connection,
-     * and then if the connection is OK, build the message body by <code> buildMessage </code> method.
-     * Finally, send the message and quit the IRC.
+     * and then if the connection is OK, call sendMessage method. Which will build the message body by <code> buildMessage </code> method.
+     * Finally, send the message according to logging level setting.
      *
      * @param cruiseControlBuildLog - A CruiseControl build log
      * @throws CruiseControlException on any error
      */
     public final void publish(Element cruiseControlBuildLog) throws CruiseControlException {
 
-        init();
-        try {
-            ircConnection.connect();
-        } catch (IOException ioe) {
-            log.error("Error: Could not connect to IRC server", ioe);
-        }
-        ircConnection.doJoin(channel);
-        String message = buildMessage(cruiseControlBuildLog);
-        ircConnection.doPrivmsg(channel, message);
-        ircConnection.doQuit();
+        initConnection();
+        sendMessage(cruiseControlBuildLog);
+
+        // TODO : Will be quit "on demand" instead...
+        //ircConnection.doQuit();
     }
 
     /**
      * Initialize an IRC connection.
      */
-    protected final void init() {
-        ircConnection = new IRCConnection(host, new int[]{port}, null, nickName, userName, realName);
-        ircConnection.addIRCEventListener(new Listener());
-        ircConnection.setEncoding("UTF-8");
-        ircConnection.setPong(true);
-        ircConnection.setDaemon(false);
-        ircConnection.setColors(true);
+    protected final void initConnection() {
+        if (!connected) {
+            ircConnection = new IRCConnection(host, new int[]{port}, null, nickName, userName, realName);
+            ircConnection.addIRCEventListener(new Listener());
+            ircConnection.setEncoding("UTF-8");
+            ircConnection.setPong(true);
+            ircConnection.setDaemon(false);
+            ircConnection.setColors(true);
+            try {
+                ircConnection.connect();
+            } catch (IOException ioe) {
+                LOG.error("Error: Could not connect to IRC server", ioe);
+            }
+            ircConnection.doJoin(channel);
+            LOG.info("Connected to IRC server");
+            LOG.info("Joined channel: " + channel);
+            connected = true;
+        }
+
+
+    }
+
+
+    protected final void sendMessage(Element cruiseControlBuildLog) throws CruiseControlException {
+
+        String message = buildMessage(cruiseControlBuildLog);
+
+        if (buildResult != null && loggingLevel != null) {
+            if (loggingLevel.trim().equalsIgnoreCase("pass")) {
+                LOG.info("Logging level: \"pass\" sending build result to IRC server...");
+                ircConnection.doPrivmsg(channel, message);
+            } else if (loggingLevel.trim().equalsIgnoreCase("fail")) {
+                LOG.info("Logging level: \"fail\" sending only fail and fixed result to IRC server...");
+                if (buildResult.equals("fixed") || buildResult.equals("fail")) {
+                    ircConnection.doPrivmsg(channel, message);
+                }
+            } else {
+                LOG.info("Logging level: \"off\" not sending any build result to IRC server...");
+            }
+        } else {
+            LOG.error("Error: Could not retrieve buildResult or loggingLevel info");
+        }
     }
 
     /**
@@ -82,30 +112,33 @@ public class KrazipIRCPublisher implements Publisher {
      * @throws CruiseControlException on any error
      */
     protected final String buildMessage(Element cruiseControlBuildLog) throws CruiseControlException {
+
         XMLLogHelper ccBuildLog = new XMLLogHelper(cruiseControlBuildLog);
+        String projectName = ccBuildLog.getProjectName();
+        String buildTimeStamp = ccBuildLog.getBuildTimestamp();
         String msg = "";
         if (ccBuildLog.isBuildSuccessful()) {
-            msg += "Build completed successfully for project \"" + ccBuildLog.getProjectName() +"\"";
+            buildResult = "pass";
+            msg += "\"" + projectName + "\" build completed successfully";
         } else if (ccBuildLog.isBuildFix()) {
-            msg += "Build fixed for project \"" + ccBuildLog.getProjectName() +"\"";
+            buildResult = "fixed";
+            msg += "\"" + projectName + "\" build fixed.";
         } else {
-            msg += "Build FAILURE for project \"" + ccBuildLog.getProjectName() + "\". ";
+            buildResult = "fail";
+            msg += "\"" + projectName + "\" build failed. ";
             msg += "Includes changes by ";
             Set changeSet = ccBuildLog.getBuildParticipants();
             Iterator iter = changeSet.iterator();
             StringBuilder sb = new StringBuilder();
             while (iter.hasNext()) {
-                //String modname = (String) iter.next();
-                //msg += modname;
                 sb.append((String) iter.next());
                 if (iter.hasNext()) {
-                    //msg += ", ";
                     sb.append(", ");
                 }
             }
             msg += sb.toString();
         }
-        msg += ". Please see more details at " + getResultURL(ccBuildLog);
+        msg += ". (" + getResultURL(ccBuildLog) + ")";
         return msg;
     }
 
@@ -145,7 +178,7 @@ public class KrazipIRCPublisher implements Publisher {
     /**
      * Called after the configuration is read to make sure that all the mandatory parameters were specified.
      *
-     *  @throws CruiseControlException if there was a configuration error.
+     * @throws CruiseControlException if there was a configuration error.
      */
     public final void validate() throws CruiseControlException {
         ValidationHelper.assertIsSet(host, "host", this.getClass());
@@ -153,6 +186,7 @@ public class KrazipIRCPublisher implements Publisher {
         ValidationHelper.assertIsSet(userName, "userName", this.getClass());
         ValidationHelper.assertIsSet(channel, "channel", this.getClass());
         ValidationHelper.assertIsSet(resultURL, "resultURL", this.getClass());
+        ValidationHelper.assertIsSet(loggingLevel, "loggingLevel", this.getClass());
     }
 
 
@@ -212,9 +246,25 @@ public class KrazipIRCPublisher implements Publisher {
         this.resultURL = resultURL;
     }
 
+    public String getLoggingLevel() {
+        return loggingLevel;
+    }
+
+    public void setLoggingLevel(String loggingLevel) {
+        this.loggingLevel = loggingLevel;
+    }
+
+    public static boolean isConnected() {
+        return connected;
+    }
+
+    public static void setConnected(boolean connected) {
+        KrazipIRCPublisher.connected = connected;
+    }
+
     /**
      * Implementation of IRCEventListener
-     *
+     * 
      * <i>Quote from <code>org.schwering.irc.lib.IRCEventListener</code></i>
      *
      * Used as listener for incoming events like messages.

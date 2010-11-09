@@ -24,8 +24,8 @@ public class KrazipIRCPublisherTest {
         KrazipIRCPublisherTest publisherTest = new KrazipIRCPublisherTest();
         Element cruiseControlBuildLog = publisherTest.createcruiseControlBuildLog(true);
         Assert.assertEquals
-                ("Build completed successfully for project \"someProjectname\". " +
-                        "Please see more details at http://www.someurl.com/someProjectName?log=log123456789",
+                ("\"someProjectname\" build completed successfully. " +
+                        "(http://www.someurl.com/someProjectName?log=log123456789)",
                         publisher.buildMessage(cruiseControlBuildLog));
     }
 
@@ -37,11 +37,10 @@ public class KrazipIRCPublisherTest {
         publisher.setResultURL("http://www.someurl.com/someProjectName");
         KrazipIRCPublisherTest publisherTest = new KrazipIRCPublisherTest();
         Element cruiseControlBuildLog = publisherTest.createcruiseControlBuildLog(false);
-        System.out.println("testBuildFailMessage : "+ publisher.buildMessage(cruiseControlBuildLog) );
         Assert.assertEquals
-                ("Build FAILURE for project \"someProjectname\". Includes changes by someEmail@someHost.com, " +
-                        "someEmail2@someHost.com. Please see more details at " +
-                        "http://www.someurl.com/someProjectName?log=log123456789",
+                ("\"someProjectname\" build failed. Includes changes by someEmail@someHost.com, " +
+                        "someEmail2@someHost.com. (" +
+                        "http://www.someurl.com/someProjectName?log=log123456789)",
                         publisher.buildMessage(cruiseControlBuildLog));
     }
 
@@ -163,6 +162,11 @@ public class KrazipIRCPublisherTest {
         lastbuildsuccessful.setAttribute("name", "lastbuildsuccessful");
         lastbuildsuccessful.setAttribute("value", "true");
 
+        Element ccTimeStamp = new Element("property");
+        ccTimeStamp.setAttribute("name", "cctimestamp");
+        ccTimeStamp.setAttribute("value", "20101109095534");
+
+        infoElement.addContent(ccTimeStamp);
         infoElement.addContent(lastbuildsuccessful);
         infoElement.addContent(lastsuccessfulbuild);
         infoElement.addContent(projNameElement);
