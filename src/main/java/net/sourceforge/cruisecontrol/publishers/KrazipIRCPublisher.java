@@ -34,13 +34,13 @@ public class KrazipIRCPublisher implements Publisher {
     private static final String FAIL = "fail";
     private static boolean connected = false;
     private static List<BuildResult> buildList = new ArrayList<BuildResult>();
-    private static String channel;
     private int port = DEFAULT_IRC_PORT;
     private String host;
     private String nickName = "Krazip";
     private String userName = "Krazip";
     private String realName = "Krazip CruiseControl IRC publisher";
     private String resultURL;
+    private String channel;
     private String loggingLevel = FAIL; // pass, fail(including fixed), off
     private String buildResult;
     private IRCconnection irc = null;
@@ -245,7 +245,7 @@ public class KrazipIRCPublisher implements Publisher {
     }
 
     public final void setChannel(String channel) {
-        KrazipIRCPublisher.channel = channel;
+        this.channel = channel;
     }
 
     public final String getHost() {

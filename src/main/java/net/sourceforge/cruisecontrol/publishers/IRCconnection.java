@@ -7,7 +7,7 @@ import org.schwering.irc.lib.IRCEventListener;
 import java.io.IOException;
 
 
-public class IRCconnection {
+public final class IRCconnection {
 
     private static final Logger log = Logger.getLogger(IRCconnection.class);
 
