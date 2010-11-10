@@ -7,14 +7,14 @@ import org.schwering.irc.lib.IRCEventListener;
 import java.io.IOException;
 
 
-public final class IRCconnection {
+public final class KrazipIrcConnection {
 
-    private static final Logger log = Logger.getLogger(IRCconnection.class);
+    private static final Logger log = Logger.getLogger(KrazipIrcConnection.class);
 
-    private static IRCconnection instance;
+    private static KrazipIrcConnection instance;
     private IRCConnection realConnection;
 
-    private IRCconnection(String host, int port, String nickName, String userName, String realName, String channel, IRCEventListener listener) {
+    private KrazipIrcConnection(String host, int port, String nickName, String userName, String realName, String channel, IRCEventListener listener) {
         IRCConnection ircConnection = new IRCConnection(host, new int[]{port}, null, nickName, userName, realName);
         ircConnection.addIRCEventListener(listener);
         ircConnection.setEncoding("UTF-8");
@@ -32,9 +32,9 @@ public final class IRCconnection {
         realConnection = ircConnection;
     }
 
-    public static synchronized IRCconnection establishInstance(String host, int port, String nickName, String userName, String realName, String channel, KrazipIRCPublisher krazip) {
+    public static synchronized KrazipIrcConnection establishInstance(String host, int port, String nickName, String userName, String realName, String channel, KrazipIRCPublisher krazip) {
         if ( instance == null ) {
-            instance = new IRCconnection(host, port, nickName, userName, realName, channel, new Listener( krazip ));
+            instance = new KrazipIrcConnection(host, port, nickName, userName, realName, channel, new Listener( krazip ));
         }
         return instance;
     }

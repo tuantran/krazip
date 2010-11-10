@@ -32,8 +32,8 @@ public class KrazipIRCPublisher implements Publisher {
     private static final String PASS = "pass";
     private static final String FIXED = "fixed";
     private static final String FAIL = "fail";
-    private static boolean connected = false;
     private static List<BuildResult> buildList = new ArrayList<BuildResult>();
+    private static List<FollowProject> followList = new ArrayList<FollowProject>();
     private int port = DEFAULT_IRC_PORT;
     private String host;
     private String nickName = "Krazip";
@@ -43,7 +43,7 @@ public class KrazipIRCPublisher implements Publisher {
     private String channel;
     private String loggingLevel = FAIL; // pass, fail(including fixed), off
     private String buildResult;
-    private IRCconnection irc = null;
+    private KrazipIrcConnection irc = null;
 
     /**
      * The main method for publishing build result into IRC. Firstly, initialize an IRC connection,
@@ -62,9 +62,9 @@ public class KrazipIRCPublisher implements Publisher {
 
     private IRCConnection ensureIrcConnection() {
         if (irc == null) {
-            irc = IRCconnection.establishInstance(host, port, nickName, userName, realName, channel, this);
+            irc = KrazipIrcConnection.establishInstance(host, port, nickName, userName, realName, channel, this);
         }
-        return IRCconnection.retrieveInstance();
+        return KrazipIrcConnection.retrieveInstance();
     }
 
     protected final void sendMessage(Element cruiseControlBuildLog) throws CruiseControlException {
@@ -96,7 +96,6 @@ public class KrazipIRCPublisher implements Publisher {
      * @throws CruiseControlException on any error
      */
     protected final String buildMessage(Element cruiseControlBuildLog) throws CruiseControlException {
-
         XMLLogHelper ccBuildLog = new XMLLogHelper(cruiseControlBuildLog);
         String projectName = ccBuildLog.getProjectName();
         String buildTimeStamp = ccBuildLog.getBuildTimestamp();
@@ -165,40 +164,126 @@ public class KrazipIRCPublisher implements Publisher {
 
 
     public void responsePrivateMessage(String sender, String msg, boolean shout) {
-
         String[] msgTmp = msg.split(" ");
         String scope;
         if (shout) { // Public message
             scope = channel;
-            if (msgTmp.length == 2 && msgTmp[0].trim().equalsIgnoreCase("krazip")) {
-
-                log.info("Krazip command passed(shout) : " + msgTmp[0] + " and " + msgTmp[1]);
-                if (msgTmp[1].trim().equalsIgnoreCase("help")) {
-                    sendMessage(null, null, scope); // Send help
-                } else {
-                    sendMessage(getLastBuild(buildList, msgTmp[1]), msgTmp[1], scope);
+            if (msgTmp[0].trim().equalsIgnoreCase("krazip")) {
+                if (msgTmp.length == 2) {
+                    if (msgTmp[1].trim().equalsIgnoreCase("help")) {
+                        sendBuildResult(null, null, scope); // Send help
+                    } else if (msgTmp[1].trim().equalsIgnoreCase("list")) {
+                        listFollowingProject(sender);
+                    } else {
+                        sendBuildResult(getLastBuild(buildList, msgTmp[1]), msgTmp[1], scope);
+                    }
+                } else if (msgTmp.length == 3) {
+                    if (msgTmp[1].trim().equalsIgnoreCase("follow")) {
+                        followProject(msgTmp[2], sender);
+                    } else if (msgTmp[1].trim().equalsIgnoreCase("unfollow")) {
+                        unfollowProject(msgTmp[2], sender);
+                    }
                 }
-
             }
         } else { // Private message
             scope = sender;
             if (msgTmp.length == 1) {
-
-                log.info("Krazip command passed(private) : " + msgTmp[0]);
                 if (msgTmp[0].trim().equalsIgnoreCase("help")) {
-                    sendMessage(null, null, scope); // Send help
+                    sendBuildResult(null, null, scope); // Send help
+                } else if (msgTmp[0].trim().equalsIgnoreCase("list")) {
+                    listFollowingProject(sender);
                 } else {
-                    sendMessage(getLastBuild(buildList, msgTmp[0]), msgTmp[0], scope);
+                    sendBuildResult(getLastBuild(buildList, msgTmp[0]), msgTmp[0], scope);
+                }
+            } else if (msgTmp.length == 2) {
+                if (msgTmp[0].trim().equalsIgnoreCase("follow")) {
+                    followProject(msgTmp[1], sender);
+                } else if (msgTmp[0].trim().equalsIgnoreCase("unfollow")) {
+                    unfollowProject(msgTmp[1], sender);
                 }
             }
         }
 
     }
 
-    public void sendMessage(BuildResult buildResult, String requestedProjectName, String scope) {
+    public void followProject(String requestedProjectName, String sender) {
+        BuildResult buildResult = getLastBuild(buildList, requestedProjectName);
+        if (buildResult != null && buildResult.getProjectName() != null) {
+            boolean alreadyFollow = false;
+            for (int i = 0; i < followList.size(); i++) {
+                String projectNameTmp = followList.get(i).getProjectName();
+                String followerTmp = followList.get(i).getFollower();
+                if (projectNameTmp.equalsIgnoreCase(requestedProjectName.trim()) && followerTmp.equalsIgnoreCase(sender.trim())) {
+                    ensureIrcConnection().doPrivmsg(sender, "You are already following project \"" + projectNameTmp + "\"");
+                    log.info(sender + " is already following " + projectNameTmp);
+                    alreadyFollow = true;
+                }
+            }
+            if (!alreadyFollow) {
+                String projectName = buildResult.getProjectName();
+                followList.add(new FollowProject(projectName, sender));
+                ensureIrcConnection().doPrivmsg(sender, "You are now following project \"" + projectName + "\"");
+                log.info("followList = " + projectName + " : " + sender + " (ADDED) size=" + followList.size());
+                log.info(sender + " is now following " + projectName);
+            }
+        } else {
+            sendBuildResult(null, requestedProjectName, sender);
+            log.info(sender + " is trying to follow not existing project : " + requestedProjectName);
+        }
+    }
 
+    public void unfollowProject(String requestedProjectName, String sender) {
+        boolean found = false;
+        for (int i = 0; i < followList.size(); i++) {
+            String projectName = followList.get(i).getProjectName();
+            String follower = followList.get(i).getFollower();
+            log.info("followList = " + projectName + " : " + follower);
+            if (projectName.equalsIgnoreCase(requestedProjectName.trim()) && follower.equalsIgnoreCase(sender.trim())) {
+                followList.remove(i);
+                ensureIrcConnection().doPrivmsg(sender, "You are stop following project \"" + projectName + "\"");
+                log.info("followList = " + projectName + " : " + follower + " (DELETED) size=" + followList.size());
+                log.info(sender + " is stop following " + projectName);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            ensureIrcConnection().doPrivmsg(sender, "You are currently not following project \"" + requestedProjectName + "\"");
+            log.info(sender + " is not currently following " + requestedProjectName);
+        }
+    }
+
+    public void listFollowingProject(String sender) {
+        boolean found = false;
+        StringBuilder msg = new StringBuilder();
+        msg.append("You are now following : ");
+        for (int i = 0; i < followList.size(); i++) {
+            String projectName = followList.get(i).getProjectName();
+            String follower = followList.get(i).getFollower();
+            if (follower.equalsIgnoreCase(sender.trim())) {
+                msg.append("\"" + projectName + "\"");
+                if (i + 1 < followList.size()) {
+                    msg.append(", ");
+                } else {
+                    msg.append(".");
+                }
+                found = true;
+            }
+        }
+        if (found) {
+            ensureIrcConnection().doPrivmsg(sender, msg.toString());
+            log.info(msg.toString());
+        } else {
+            ensureIrcConnection().doPrivmsg(sender, "You are not following any project");
+            log.info(sender + " is not following any project");
+        }
+    }
+
+    public void sendBuildResult(BuildResult buildResult, String requestedProjectName, String scope) {
         if (buildResult == null && requestedProjectName == null) {
-            String helpMessage = "Usage : krazip [projectName] To display last build result for specified project, [help] To display this message";
+            String helpMessage = "Usage : krazip [projectName] to display last build result for specified project, " +
+                    "[follow {projectName}] to follow specified project, [unfollow {projectName}] to unfollow " +
+                    "specified project, [list] to list currently following project, [help] to display this message";
             ensureIrcConnection().doPrivmsg(scope, helpMessage);
         } else {
             if (buildResult != null && buildResult.getMessage() != null) {
@@ -213,7 +298,6 @@ public class KrazipIRCPublisher implements Publisher {
     }
 
     public BuildResult getLastBuild(List<BuildResult> buildList, String projectName) {
-
         BuildResult result = new BuildResult();
         for (int i = buildList.size() - 1; i > -1; i--) {
             if (buildList.get(i).getProjectName().trim().equalsIgnoreCase(projectName.trim())) {
@@ -302,14 +386,6 @@ public class KrazipIRCPublisher implements Publisher {
 
     public void setLoggingLevel(String loggingLevel) {
         this.loggingLevel = loggingLevel;
-    }
-
-    public static boolean isConnected() {
-        return connected;
-    }
-
-    public static void setConnected(boolean connected) {
-        KrazipIRCPublisher.connected = connected;
     }
 
 }
