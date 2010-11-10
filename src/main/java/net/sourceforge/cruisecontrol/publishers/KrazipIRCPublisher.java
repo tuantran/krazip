@@ -71,18 +71,18 @@ public class KrazipIRCPublisher implements Publisher {
      */
     protected final void initConnection() {
         if (!connected) {
-            KrazipIRCPublisher.ircConnection = new IRCConnection(host, new int[]{port}, null, nickName, userName, realName);
-            KrazipIRCPublisher.ircConnection.addIRCEventListener(new Listener());
-            KrazipIRCPublisher.ircConnection.setEncoding("UTF-8");
-            KrazipIRCPublisher.ircConnection.setPong(true);
-            KrazipIRCPublisher.ircConnection.setDaemon(false);
-            KrazipIRCPublisher.ircConnection.setColors(true);
+            ircConnection = new IRCConnection(host, new int[]{port}, null, nickName, userName, realName);
+            ircConnection.addIRCEventListener(new Listener());
+            ircConnection.setEncoding("UTF-8");
+            ircConnection.setPong(true);
+            ircConnection.setDaemon(false);
+            ircConnection.setColors(true);
             try {
-                KrazipIRCPublisher.ircConnection.connect();
+                ircConnection.connect();
             } catch (IOException ioe) {
                 log.error("Error: Could not connect to IRC server", ioe);
             }
-            KrazipIRCPublisher.ircConnection.doJoin(channel);
+            ircConnection.doJoin(channel);
             log.info("Connected to IRC server");
             log.info("Joined channel: " + channel);
             connected = true;
@@ -99,11 +99,11 @@ public class KrazipIRCPublisher implements Publisher {
         if (buildResult != null && loggingLevel != null) {
             if (loggingLevel.trim().equalsIgnoreCase(PASS)) {
                 log.info("Logging level: \"pass\" sending build result to IRC server...");
-                KrazipIRCPublisher.ircConnection.doPrivmsg(channel, message);
+                ircConnection.doPrivmsg(channel, message);
             } else if (loggingLevel.trim().equalsIgnoreCase(FAIL)) {
                 log.info("Logging level: \"fail\" sending only fail and fixed result to IRC server...");
                 if (buildResult.equals(FIXED) || buildResult.equals("fail")) {
-                    KrazipIRCPublisher.ircConnection.doPrivmsg(channel, message);
+                    ircConnection.doPrivmsg(channel, message);
                 }
             } else {
                 log.info("Logging level: \"off\" not sending any build result to IRC server...");
@@ -406,17 +406,17 @@ public class KrazipIRCPublisher implements Publisher {
     public static void sendMessage(BuildResult buildResult, String requestedProjectName, String scope) {
         if (buildResult != null && buildResult.getMessage() != null) {
             // Send response message to IRC
-            KrazipIRCPublisher.ircConnection.doPrivmsg(scope, buildResult.getMessage());
+            ircConnection.doPrivmsg(scope, buildResult.getMessage());
         } else {
             // Requested projectName not found in ArrayList
-            KrazipIRCPublisher.ircConnection.doPrivmsg(scope, "Project name \"" + requestedProjectName + "\" not found or it haven't been built" +
+            ircConnection.doPrivmsg(scope, "Project name \"" + requestedProjectName + "\" not found or it haven't been built" +
                     " since CruiseControl last re-started");
         }
     }
     // TODO : I think I could merge sendMessage and sendHelp together...so we minimize the usage of ircConnection
     public static void sendHelp(String scope) {
         String helpMessage = "Usage : krazip [projectName] To display last build result for specified project, [help] To display this message";
-        KrazipIRCPublisher.ircConnection.doPrivmsg(scope, helpMessage);
+        ircConnection.doPrivmsg(scope, helpMessage);
 
     }
 
