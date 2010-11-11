@@ -24,18 +24,24 @@ import java.util.Set;
  * @author Pongvech Vechprasit (pun@abctech-thailand.com)
  */
 
+
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_BAD_FIELD")
 public class KrazipIRCPublisher implements Publisher {
 
     private static final Logger log = Logger.getLogger(KrazipIRCPublisher.class);
-    private static final int DEFAULT_IRC_PORT = 6667;
     private static final String PASS = "pass";
     private static final String FIXED = "fixed";
     private static final String FAIL = "fail";
     private static final String OFF = "off";
+    private static final String HELP = "help";
+    private static final String LIST = "list";
+    private static final String LOGGING = "logging";
+    private static final String UNFOLLOW = "unfollow";
+    private static final String FOLLOW = "follow";
     private static final int ONE_ARGUMENT_PASSED = 1;
     private static final int TWO_ARGUMENTS_PASSED = 2;
     private static final int THREE_ARGUMENTS_PASSED = 3;
+    private static final int DEFAULT_IRC_PORT = 6667;
     private static List<KrazipBuildResult> krazipBuildList = new ArrayList<KrazipBuildResult>();
     private static List<KrazipFollowProject> krazipFollowList = new ArrayList<KrazipFollowProject>();
     private static String overrideGlobalLogging = "nothing";
@@ -59,14 +65,13 @@ public class KrazipIRCPublisher implements Publisher {
      * @throws CruiseControlException on any error
      */
     public final void publish(Element cruiseControlBuildLog) throws CruiseControlException {
-
         ensureIrcConnection();
         sendMessage(cruiseControlBuildLog);
-
     }
 
     /**
      * Create a connection to IRC is connection is not existing.
+     *
      * @return IRCConnection return an IRC connection that uses for sending messages to IRC server
      */
     private IRCConnection ensureIrcConnection() {
@@ -78,13 +83,12 @@ public class KrazipIRCPublisher implements Publisher {
 
     /**
      * For sending a build message according to logging level and check for override global logging level from IRC
+     *
      * @param cruiseControlBuildLog a build log from CruiseControl
      * @throws CruiseControlException throw <code>CruiseControlException</code> if something wrong
      */
     protected final void sendMessage(Element cruiseControlBuildLog) throws CruiseControlException {
-
         String message = buildMessage(cruiseControlBuildLog);
-
         if (!overrideGlobalLogging.equalsIgnoreCase(OFF)) {
             if (buildResult != null && loggingLevel != null) {
                 if (!overrideGlobalLogging.equalsIgnoreCase("nothing")) {
@@ -168,19 +172,15 @@ public class KrazipIRCPublisher implements Publisher {
                 logFileName.substring(
                         logFileName.lastIndexOf(File.separator) + 1,
                         logFileName.lastIndexOf('.'));
-
         StringBuffer str = new StringBuffer();
         str.append(getResultURL());
-
         if (resultURL.indexOf('?') == -1) {
             str.append("?");
         } else {
             str.append("&");
         }
-
         str.append("log=");
         str.append(baseLogFileName);
-
         return str.toString();
     }
 
@@ -195,6 +195,7 @@ public class KrazipIRCPublisher implements Publisher {
      * <li>[logging] - To display current logging level</li>
      * <li>[logging {PASS}{FAIL}{OFF}] - To override global logging level</li>
      * </ul>
+     *
      * @param sender
      * @param msg
      */
@@ -203,27 +204,26 @@ public class KrazipIRCPublisher implements Publisher {
         String scope = channel;
         if (msgTmp[0].trim().toLowerCase().contains("krazip")) {
             if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
-                if (msgTmp[1].trim().equalsIgnoreCase("help")) {
+                if (msgTmp[1].trim().equalsIgnoreCase(HELP)) {
                     sendBuildResult(null, null, scope); // Send help
-                } else if (msgTmp[1].trim().equalsIgnoreCase("list")) {
+                } else if (msgTmp[1].trim().equalsIgnoreCase(LIST)) {
                     listProject(sender);
                     listFollowingProject(sender);
-                } else if (msgTmp[1].trim().equalsIgnoreCase("logging")) {
+                } else if (msgTmp[1].trim().equalsIgnoreCase(LOGGING)) {
                     getOverrideGlobalLoggingLevel(sender);
                 } else {
                     sendBuildResult(findNewestBuildByName(krazipBuildList, msgTmp[1]), msgTmp[1], scope);
                 }
             } else if (msgTmp.length == THREE_ARGUMENTS_PASSED) {
-                if (msgTmp[1].trim().equalsIgnoreCase("follow")) {
+                if (msgTmp[1].trim().equalsIgnoreCase(FOLLOW)) {
                     followProject(msgTmp[2], sender);
-                } else if (msgTmp[1].trim().equalsIgnoreCase("unfollow")) {
+                } else if (msgTmp[1].trim().equalsIgnoreCase(UNFOLLOW)) {
                     unfollowProject(msgTmp[2], sender);
-                } else if (msgTmp[1].trim().equalsIgnoreCase("logging")) {
+                } else if (msgTmp[1].trim().equalsIgnoreCase(LOGGING)) {
                     setOverrideGlobalLoggingLevel(msgTmp[2], sender, scope);
                 }
             }
         }
-
     }
 
     /**
@@ -238,6 +238,7 @@ public class KrazipIRCPublisher implements Publisher {
      * <li>[logging] - To display current logging level</li>
      * <li>[logging {PASS}{FAIL}{OFF}] - To override global logging level</li>
      * </ul>
+     *
      * @param sender
      * @param msg
      */
@@ -245,31 +246,32 @@ public class KrazipIRCPublisher implements Publisher {
         String[] msgTmp = msg.split("\\s+");
         String scope = channel;
         if (msgTmp.length == ONE_ARGUMENT_PASSED) {
-            if (msgTmp[0].trim().equalsIgnoreCase("help")) {
+            if (msgTmp[0].trim().equalsIgnoreCase(HELP)) {
                 sendBuildResult(null, null, sender); // Send help
-            } else if (msgTmp[0].trim().equalsIgnoreCase("list")) {
+            } else if (msgTmp[0].trim().equalsIgnoreCase(LIST)) {
                 listProject(sender);
                 listFollowingProject(sender);
-            } else if (msgTmp[0].trim().equalsIgnoreCase("logging")) {
+            } else if (msgTmp[0].trim().equalsIgnoreCase(LOGGING)) {
                 getOverrideGlobalLoggingLevel(sender);
             } else {
                 sendBuildResult(findNewestBuildByName(krazipBuildList, msgTmp[0]), msgTmp[0], sender);
             }
         } else if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
-            if (msgTmp[0].trim().equalsIgnoreCase("follow")) {
+            if (msgTmp[0].trim().equalsIgnoreCase(FOLLOW)) {
                 followProject(msgTmp[1], sender);
-            } else if (msgTmp[0].trim().equalsIgnoreCase("unfollow")) {
+            } else if (msgTmp[0].trim().equalsIgnoreCase(UNFOLLOW)) {
                 unfollowProject(msgTmp[1], sender);
-            } else if (msgTmp[0].trim().equalsIgnoreCase("logging")) {
+            } else if (msgTmp[0].trim().equalsIgnoreCase(LOGGING)) {
                 setOverrideGlobalLoggingLevel(msgTmp[1], sender, scope);
             }
         }
     }
 
     /**
-     *  To follow the specified project. Add user to <code>krazipFollowList</code> If user not already exists in the list.
+     * To follow the specified project. Add user to <code>krazipFollowList</code> If user not already exists in the list.
+     *
      * @param requestedProjectName a project name that user wishes to follow
-     * @param sender a user that requested to follow
+     * @param sender               a user that requested to follow
      */
     public void followProject(String requestedProjectName, String sender) {
         KrazipBuildResult krazipBuildResult = findNewestBuildByName(krazipBuildList, requestedProjectName);
@@ -301,9 +303,10 @@ public class KrazipIRCPublisher implements Publisher {
     }
 
     /**
-     *  To unfollow the specified project. Remove user from <code>krazipFollowList</code> If user exists in the list.
+     * To unfollow the specified project. Remove user from <code>krazipFollowList</code> If user exists in the list.
+     *
      * @param requestedProjectName a project name that user wishes to unfollow
-     * @param sender a user that requested to unfollow
+     * @param sender               a user that requested to unfollow
      */
     public void unfollowProject(String requestedProjectName, String sender) {
         boolean found = false;
@@ -330,6 +333,7 @@ public class KrazipIRCPublisher implements Publisher {
 
     /**
      * For listing project that user following
+     *
      * @param sender a user who requested the list
      */
     public void listFollowingProject(String sender) {
@@ -359,7 +363,8 @@ public class KrazipIRCPublisher implements Publisher {
     }
 
     /**
-     *  For listing projects in Krazip memory
+     * For listing projects in Krazip memory
+     *
      * @param sender a user who requested the list
      */
     public void listProject(String sender) {
@@ -392,8 +397,9 @@ public class KrazipIRCPublisher implements Publisher {
 
     /**
      * Send build message to project's follower by querying the <code>krazipFollowList</code>
+     *
      * @param projectName name of the project
-     * @param msg build message
+     * @param msg         build message
      */
     public void sendMessageToFollower(String projectName, String msg) {
         for (KrazipFollowProject aKrazipFollowList : krazipFollowList) {
@@ -403,14 +409,14 @@ public class KrazipIRCPublisher implements Publisher {
                 ensureIrcConnection().doPrivmsg(follower, msg);
             }
         }
-
     }
 
     /**
-     *  For sending last build result and help message to IRC. If buildResult and requestedProjectName are null, Krazip will send help message.
-     * @param krazipBuildResult last build result get from <code>findNewestBuildByName</code>
+     * For sending last build result and help message to IRC. If buildResult and requestedProjectName are null, Krazip will send help message.
+     *
+     * @param krazipBuildResult    last build result get from <code>findNewestBuildByName</code>
      * @param requestedProjectName project name that was requested to see the last build result
-     * @param scope message scope to be sent to IRC
+     * @param scope                message scope to be sent to IRC
      */
     public void sendBuildResult(KrazipBuildResult krazipBuildResult, String requestedProjectName, String scope) {
         if (krazipBuildResult == null && requestedProjectName == null) {
@@ -434,10 +440,11 @@ public class KrazipIRCPublisher implements Publisher {
     }
 
     /**
-     *  Override current logging level with new logging level passed from IRC
+     * Override current logging level with new logging level passed from IRC
+     *
      * @param setting new logging level passed from IRC
-     * @param sender user that issued the command
-     * @param scope message scope to be sent to IRC
+     * @param sender  user that issued the command
+     * @param scope   message scope to be sent to IRC
      */
     public void setOverrideGlobalLoggingLevel(String setting, String sender, String scope) {
         if (setting.trim().equalsIgnoreCase(PASS) || setting.trim().equalsIgnoreCase(FAIL) ||
@@ -455,7 +462,8 @@ public class KrazipIRCPublisher implements Publisher {
     }
 
     /**
-     *  Return current logging level to sender in IRC
+     * Return current logging level to sender in IRC
+     *
      * @param sender
      */
     public void getOverrideGlobalLoggingLevel(String sender) {
@@ -465,18 +473,18 @@ public class KrazipIRCPublisher implements Publisher {
         } else {
             ensureIrcConnection().doPrivmsg(sender, "Global logging level is : \"" + loggingLevel.toUpperCase() + "\"");
         }
-
     }
 
     /**
      * Find the build that matches the given project name.
      * <p> Scope is protected for the benefit of junit tests. </p>
+     *
      * @return The newest build with the given project name, or null if none were found.
      */
     protected KrazipBuildResult findNewestBuildByName(List<KrazipBuildResult> krazipBuildList, String projectName) {
         List<KrazipBuildResult> reverse = new ArrayList<KrazipBuildResult>(krazipBuildList);
         Collections.reverse(reverse);
-        for ( KrazipBuildResult build : reverse ) {
+        for (KrazipBuildResult build : reverse) {
             if (build.getProjectName().trim().equalsIgnoreCase(projectName.trim())) {
                 return build;
             }
