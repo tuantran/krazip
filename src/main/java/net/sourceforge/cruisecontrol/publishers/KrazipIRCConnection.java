@@ -7,14 +7,14 @@ import org.schwering.irc.lib.IRCEventListener;
 import java.io.IOException;
 
 
-public final class KrazipIrcConnection {
+public final class KrazipIRCConnection {
 
-    private static final Logger log = Logger.getLogger(KrazipIrcConnection.class);
+    private static final Logger log = Logger.getLogger(KrazipIRCConnection.class);
 
-    private static KrazipIrcConnection instance;
+    private static KrazipIRCConnection instance;
     private IRCConnection realConnection;
 
-    private KrazipIrcConnection(String host, int port, String nickName, String userName, String realName, String channel, IRCEventListener listener) {
+    private KrazipIRCConnection(String host, int port, String nickName, String userName, String realName, String channel, IRCEventListener listener) {
         IRCConnection ircConnection = new IRCConnection(host, new int[]{port}, null, nickName, userName, realName);
         ircConnection.addIRCEventListener(listener);
         ircConnection.setEncoding("UTF-8");
@@ -32,9 +32,9 @@ public final class KrazipIrcConnection {
         realConnection = ircConnection;
     }
 
-    public static synchronized KrazipIrcConnection establishInstance(String host, int port, String nickName, String userName, String realName, String channel, KrazipIRCPublisher krazip) {
+    public static synchronized KrazipIRCConnection establishInstance(String host, int port, String nickName, String userName, String realName, String channel, KrazipIRCPublisher krazip) {
         if ( instance == null ) {
-            instance = new KrazipIrcConnection(host, port, nickName, userName, realName, channel, new KrazipIRCListener( krazip ));
+            instance = new KrazipIRCConnection(host, port, nickName, userName, realName, channel, new KrazipIRCListener( krazip ));
         }
         return instance;
     }

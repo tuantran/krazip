@@ -1,15 +1,15 @@
 package net.sourceforge.cruisecontrol.publishers;
 
-public class FollowProject {
+public class KrazipFollowProject {
 
     private String projectName;
     private String follower;
 
-    public FollowProject(){
+    public KrazipFollowProject(){
 
     }
 
-    public FollowProject(String projectName, String follower){
+    public KrazipFollowProject(String projectName, String follower){
         this.projectName = projectName;
         this.follower = follower;
     }

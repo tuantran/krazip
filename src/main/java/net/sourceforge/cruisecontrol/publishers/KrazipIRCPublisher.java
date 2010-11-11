@@ -32,8 +32,11 @@ public class KrazipIRCPublisher implements Publisher {
     private static final String PASS = "pass";
     private static final String FIXED = "fixed";
     private static final String FAIL = "fail";
+    private static final int ONE_ARGUMENT_PASSED = 1;
+    private static final int TWO_ARGUMENTS_PASSED = 2;
+    private static final int THREE_ARGUMENTS_PASSED = 3;
     private static List<KrazipBuildResult> krazipBuildList = new ArrayList<KrazipBuildResult>();
-    private static List<FollowProject> followList = new ArrayList<FollowProject>();
+    private static List<KrazipFollowProject> krazipFollowList = new ArrayList<KrazipFollowProject>();
     private int port = DEFAULT_IRC_PORT;
     private String host;
     private String nickName = "Krazip";
@@ -43,7 +46,7 @@ public class KrazipIRCPublisher implements Publisher {
     private String channel;
     private String loggingLevel = FAIL; // pass, fail(including fixed), off
     private String buildResult;
-    private KrazipIrcConnection irc = null;
+    private KrazipIRCConnection irc = null;
 
     /**
      * The main method for publishing build result into IRC. Firstly, initialize an IRC connection,
@@ -62,9 +65,9 @@ public class KrazipIRCPublisher implements Publisher {
 
     private IRCConnection ensureIrcConnection() {
         if (irc == null) {
-            irc = KrazipIrcConnection.establishInstance(host, port, nickName, userName, realName, channel, this);
+            irc = KrazipIRCConnection.establishInstance(host, port, nickName, userName, realName, channel, this);
         }
-        return KrazipIrcConnection.retrieveInstance();
+        return KrazipIRCConnection.retrieveInstance();
     }
 
     protected final void sendMessage(Element cruiseControlBuildLog) throws CruiseControlException {
@@ -126,6 +129,8 @@ public class KrazipIRCPublisher implements Publisher {
         }
         krazipBuildList.add(new KrazipBuildResult(projectName, msg, buildTimeStamp));
         log.info("buildResult added to krazipBuildList, Total item : " + krazipBuildList.size());
+        sendMessageToFollower(projectName, msg);
+        log.info("Sending build result to follower...");
         return msg;
     }
 
@@ -163,56 +168,55 @@ public class KrazipIRCPublisher implements Publisher {
     }
 
 
-    public void responsePrivateMessage(String sender, String msg, boolean shout) {
+    public void responsePrivateMessage(String sender, String msg) {
         String[] msgTmp = msg.split(" ");
-        String scope;
-        if (shout) { // Public message
-            scope = channel;
-            if (msgTmp[0].trim().equalsIgnoreCase("krazip")) {
-                if (msgTmp.length == 2) {
-                    if (msgTmp[1].trim().equalsIgnoreCase("help")) {
-                        sendBuildResult(null, null, scope); // Send help
-                    } else if (msgTmp[1].trim().equalsIgnoreCase("list")) {
-                        listFollowingProject(sender);
-                    } else {
-                        sendBuildResult(getLastBuild(krazipBuildList, msgTmp[1]), msgTmp[1], scope);
-                    }
-                } else if (msgTmp.length == 3) {
-                    if (msgTmp[1].trim().equalsIgnoreCase("follow")) {
-                        followProject(msgTmp[2], sender);
-                    } else if (msgTmp[1].trim().equalsIgnoreCase("unfollow")) {
-                        unfollowProject(msgTmp[2], sender);
-                    }
-                }
-            }
-        } else { // Private message
-            scope = sender;
-            if (msgTmp.length == 1) {
-                if (msgTmp[0].trim().equalsIgnoreCase("help")) {
+        String scope = channel;
+        if (msgTmp[0].trim().equalsIgnoreCase("krazip")) {
+            if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
+                if (msgTmp[1].trim().equalsIgnoreCase("help")) {
                     sendBuildResult(null, null, scope); // Send help
-                } else if (msgTmp[0].trim().equalsIgnoreCase("list")) {
+                } else if (msgTmp[1].trim().equalsIgnoreCase("list")) {
                     listFollowingProject(sender);
                 } else {
-                    sendBuildResult(getLastBuild(krazipBuildList, msgTmp[0]), msgTmp[0], scope);
+                    sendBuildResult(getLastBuild(krazipBuildList, msgTmp[1]), msgTmp[1], scope);
                 }
-            } else if (msgTmp.length == 2) {
-                if (msgTmp[0].trim().equalsIgnoreCase("follow")) {
-                    followProject(msgTmp[1], sender);
-                } else if (msgTmp[0].trim().equalsIgnoreCase("unfollow")) {
-                    unfollowProject(msgTmp[1], sender);
+            } else if (msgTmp.length == THREE_ARGUMENTS_PASSED) {
+                if (msgTmp[1].trim().equalsIgnoreCase("follow")) {
+                    followProject(msgTmp[2], sender);
+                } else if (msgTmp[1].trim().equalsIgnoreCase("unfollow")) {
+                    unfollowProject(msgTmp[2], sender);
                 }
             }
         }
 
     }
 
+    public void responsePrivatePrivateMessage(String sender, String msg) {
+        String[] msgTmp = msg.split(" ");
+        if (msgTmp.length == ONE_ARGUMENT_PASSED) {
+            if (msgTmp[0].trim().equalsIgnoreCase("help")) {
+                sendBuildResult(null, null, sender); // Send help
+            } else if (msgTmp[0].trim().equalsIgnoreCase("list")) {
+                listFollowingProject(sender);
+            } else {
+                sendBuildResult(getLastBuild(krazipBuildList, msgTmp[0]), msgTmp[0], sender);
+            }
+        } else if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
+            if (msgTmp[0].trim().equalsIgnoreCase("follow")) {
+                followProject(msgTmp[1], sender);
+            } else if (msgTmp[0].trim().equalsIgnoreCase("unfollow")) {
+                unfollowProject(msgTmp[1], sender);
+            }
+        }
+    }
+
     public void followProject(String requestedProjectName, String sender) {
         KrazipBuildResult krazipBuildResult = getLastBuild(krazipBuildList, requestedProjectName);
         if (krazipBuildResult != null && krazipBuildResult.getProjectName() != null) {
             boolean alreadyFollow = false;
-            for (int i = 0; i < followList.size(); i++) {
-                String projectNameTmp = followList.get(i).getProjectName();
-                String followerTmp = followList.get(i).getFollower();
+            for (int i = 0; i < krazipFollowList.size(); i++) {
+                String projectNameTmp = krazipFollowList.get(i).getProjectName();
+                String followerTmp = krazipFollowList.get(i).getFollower();
                 if (projectNameTmp.equalsIgnoreCase(requestedProjectName.trim()) && followerTmp.equalsIgnoreCase(sender.trim())) {
                     ensureIrcConnection().doPrivmsg(sender, "You are already following project \"" + projectNameTmp + "\"");
                     log.info(sender + " is already following " + projectNameTmp);
@@ -221,9 +225,9 @@ public class KrazipIRCPublisher implements Publisher {
             }
             if (!alreadyFollow) {
                 String projectName = krazipBuildResult.getProjectName();
-                followList.add(new FollowProject(projectName, sender));
+                krazipFollowList.add(new KrazipFollowProject(projectName, sender));
                 ensureIrcConnection().doPrivmsg(sender, "You are now following project \"" + projectName + "\"");
-                log.info("followList = " + projectName + " : " + sender + " (ADDED) size=" + followList.size());
+                log.info("krazipFollowList = " + projectName + " : " + sender + " (ADDED) size=" + krazipFollowList.size());
                 log.info(sender + " is now following " + projectName);
             }
         } else {
@@ -234,14 +238,14 @@ public class KrazipIRCPublisher implements Publisher {
 
     public void unfollowProject(String requestedProjectName, String sender) {
         boolean found = false;
-        for (int i = 0; i < followList.size(); i++) {
-            String projectName = followList.get(i).getProjectName();
-            String follower = followList.get(i).getFollower();
-            log.info("followList = " + projectName + " : " + follower);
+        for (int i = 0; i < krazipFollowList.size(); i++) {
+            String projectName = krazipFollowList.get(i).getProjectName();
+            String follower = krazipFollowList.get(i).getFollower();
+            log.info("krazipFollowList = " + projectName + " : " + follower);
             if (projectName.equalsIgnoreCase(requestedProjectName.trim()) && follower.equalsIgnoreCase(sender.trim())) {
-                followList.remove(i);
+                krazipFollowList.remove(i);
                 ensureIrcConnection().doPrivmsg(sender, "You are stop following project \"" + projectName + "\"");
-                log.info("followList = " + projectName + " : " + follower + " (DELETED) size=" + followList.size());
+                log.info("krazipFollowList = " + projectName + " : " + follower + " (DELETED) size=" + krazipFollowList.size());
                 log.info(sender + " is stop following " + projectName);
                 found = true;
                 break;
@@ -257,12 +261,12 @@ public class KrazipIRCPublisher implements Publisher {
         boolean found = false;
         StringBuilder msg = new StringBuilder();
         msg.append("You are now following : ");
-        for (int i = 0; i < followList.size(); i++) {
-            String projectName = followList.get(i).getProjectName();
-            String follower = followList.get(i).getFollower();
+        for (int i = 0; i < krazipFollowList.size(); i++) {
+            String projectName = krazipFollowList.get(i).getProjectName();
+            String follower = krazipFollowList.get(i).getFollower();
             if (follower.equalsIgnoreCase(sender.trim())) {
                 msg.append("\"" + projectName + "\"");
-                if (i + 1 < followList.size()) {
+                if (i + 1 < krazipFollowList.size()) {
                     msg.append(", ");
                 } else {
                     msg.append(".");
@@ -277,6 +281,17 @@ public class KrazipIRCPublisher implements Publisher {
             ensureIrcConnection().doPrivmsg(sender, "You are not following any project");
             log.info(sender + " is not following any project");
         }
+    }
+
+    public void sendMessageToFollower(String projectName, String msg) {
+        for (int i = 0; i < krazipFollowList.size(); i++) {
+            String followedProject = krazipFollowList.get(i).getProjectName();
+            if (followedProject.equalsIgnoreCase(projectName)) {
+                String follower = krazipFollowList.get(i).getFollower();
+                ensureIrcConnection().doPrivmsg(follower, msg);
+            }
+        }
+
     }
 
     public void sendBuildResult(KrazipBuildResult krazipBuildResult, String requestedProjectName, String scope) {
