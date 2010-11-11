@@ -1,14 +1,14 @@
 package net.sourceforge.cruisecontrol.publishers;
 
-public class KrazipOverrideGlobalLogging {
+public final class KrazipOverrideGlobalLogging {
 
     private static String overrideValue = "nothing";
 
-    public static String getOverrideValue() {
+    protected final static String getOverrideValue() {
         return overrideValue;
     }
 
-    public static void setOverrideValue(String overrideValue) {
+    protected final static void setOverrideValue(String overrideValue) {
         KrazipOverrideGlobalLogging.overrideValue = overrideValue;
     }
 }
