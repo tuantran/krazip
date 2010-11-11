@@ -88,11 +88,11 @@ public class KrazipIRCPublisher implements Publisher {
      */
     protected final void sendMessage(Element cruiseControlBuildLog) throws CruiseControlException {
         String message = buildMessage(cruiseControlBuildLog);
-        if (!KrazipOverrideGlobalLogging.overrideValue.equalsIgnoreCase(OFF)) {
+        if (!KrazipOverrideGlobalLogging.getOverrideValue().equalsIgnoreCase(OFF)) {
             if (buildResult != null && loggingLevel != null) {
-                if (!KrazipOverrideGlobalLogging.overrideValue.equalsIgnoreCase("nothing")) {
-                    loggingLevel = KrazipOverrideGlobalLogging.overrideValue;
-                    log.info("Logging level has been overridden to : \"" + KrazipOverrideGlobalLogging.overrideValue.toUpperCase() + "\"");
+                if (!KrazipOverrideGlobalLogging.getOverrideValue().equalsIgnoreCase("nothing")) {
+                    loggingLevel = KrazipOverrideGlobalLogging.getOverrideValue();
+                    log.info("Logging level has been overridden to : \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + "\"");
                 }
                 if (loggingLevel.trim().equalsIgnoreCase(PASS)) {
                     log.info("Logging level: \"pass\" sending build result to IRC server...");
@@ -448,11 +448,11 @@ public class KrazipIRCPublisher implements Publisher {
     public void setOverrideGlobalLoggingLevel(String setting, String sender, String scope) {
         if (setting.trim().equalsIgnoreCase(PASS) || setting.trim().equalsIgnoreCase(FAIL) ||
                 setting.trim().equalsIgnoreCase(OFF)) {
-            KrazipOverrideGlobalLogging.overrideValue = setting;
+            KrazipOverrideGlobalLogging.setOverrideValue(setting);
             ensureIrcConnection().doPrivmsg(scope, "Global logging level has been overridden to :" +
-                    " \"" + KrazipOverrideGlobalLogging.overrideValue.toUpperCase() + "\" by " + sender);
+                    " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + "\" by " + sender);
             log.info(sender + " has overridden global logging level to :" +
-                    " \"" + KrazipOverrideGlobalLogging.overrideValue.toUpperCase() + "\"");
+                    " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + "\"");
         } else {
             ensureIrcConnection().doPrivmsg(sender, "Incorrect logging level : {" + PASS.toUpperCase() +
                     "} {" + FAIL.toUpperCase() + "} {" + OFF.toUpperCase() + "}");
@@ -466,9 +466,9 @@ public class KrazipIRCPublisher implements Publisher {
      * @param scope
      */
     public void getOverrideGlobalLoggingLevel(String scope) {
-        if (!KrazipOverrideGlobalLogging.overrideValue.equalsIgnoreCase("nothing")) {
+        if (!KrazipOverrideGlobalLogging.getOverrideValue().equalsIgnoreCase("nothing")) {
             ensureIrcConnection().doPrivmsg(scope, "Global logging level has been overridden to :" +
-                    " \"" + KrazipOverrideGlobalLogging.overrideValue.toUpperCase() + "\"");
+                    " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + "\"");
         } else {
             ensureIrcConnection().doPrivmsg(scope, "Global logging level is : \"" + loggingLevel.toUpperCase() + "\"");
         }
@@ -491,7 +491,6 @@ public class KrazipIRCPublisher implements Publisher {
         return null;
     }
 
-
     /**
      * Called after the configuration is read to make sure that all the mandatory parameters were specified.
      *
@@ -505,7 +504,6 @@ public class KrazipIRCPublisher implements Publisher {
         ValidationHelper.assertIsSet(resultURL, "resultURL", this.getClass());
         ValidationHelper.assertIsSet(loggingLevel, "loggingLevel", this.getClass());
     }
-
 
     public final String getChannel() {
         return channel;
@@ -570,5 +568,4 @@ public class KrazipIRCPublisher implements Publisher {
     public void setLoggingLevel(String loggingLevel) {
         this.loggingLevel = loggingLevel;
     }
-
 }
