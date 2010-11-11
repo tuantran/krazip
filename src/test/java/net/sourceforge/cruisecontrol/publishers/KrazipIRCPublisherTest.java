@@ -5,6 +5,8 @@ import net.sourceforge.cruisecontrol.CruiseControlException;
 import org.jdom.Element;
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 /**
  * Tests for KrazipIRCPublisher
  *
@@ -186,4 +188,10 @@ public class KrazipIRCPublisherTest {
 
         return createcruiseControlBuildLog;
     }
+
+    @Test
+    public void findNewestBuildByNameWithEmptyList() {
+        new KrazipIRCPublisher().findNewestBuildByName(new ArrayList<KrazipBuildResult>(), "junit");
+    }
+
 }
