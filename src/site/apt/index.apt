@@ -5,7 +5,7 @@
 Krazip Overview
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- Krazip is a simple CruiseControl plug-in for sending live build result whether it pass, failed or fixed to IRC channel.
+ Krazip is a simple CruiseControl plug-in for sending live build resultKrazip whether it pass, failed or fixed to IRC channel.
  It's developed on CruiseControl version 2.8.4 and use external irclib.jar for IRC communication library.
 
 [images/KrazipOverview.png]
@@ -47,7 +47,7 @@ Krazip Configuration (config.xml)
 
  Here you go. Now the plug-in is registered. Now, next step is to configure the Krazip it self for IRC host address, channel etc.
 
- Krazip is the plug-in for sending build result. Thus, It's a publisher plug-in. We will put the Krazip configuration element in <publishers> element. Please see below for more details.
+ Krazip is the plug-in for sending build resultKrazip. Thus, It's a publisher plug-in. We will put the Krazip configuration element in <publishers> element. Please see below for more details.
 
 +---
        <publishers>
@@ -68,7 +68,7 @@ Krazip Configuration (config.xml)
  
  * port - IRC port number (Default 6667)
 
- * channel - IRC channel for sending the build result
+ * channel - IRC channel for sending the build resultKrazip
  
  * resulturl - This address will be appended with log address automatically. (http://www.someurl.com/someProjectName?log=log123456789)
  

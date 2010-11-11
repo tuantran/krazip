@@ -19,12 +19,12 @@ import org.schwering.irc.lib.IRCUser;
  * </p>
  */
 
-public class Listener implements IRCEventListener {
+public class KrazipIRCListener implements IRCEventListener {
     
-    private static final Logger log = Logger.getLogger(Listener.class);
+    private static final Logger log = Logger.getLogger(KrazipIRCListener.class);
     private final KrazipIRCPublisher krazipIRCPublisher;
 
-    public Listener(KrazipIRCPublisher krazipIRCPublisher) {
+    public KrazipIRCListener(KrazipIRCPublisher krazipIRCPublisher) {
         this.krazipIRCPublisher = krazipIRCPublisher;
     }
 

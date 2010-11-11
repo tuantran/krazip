@@ -1,16 +1,16 @@
 package net.sourceforge.cruisecontrol.publishers;
 
-public class BuildResult{
+public class KrazipBuildResult {
 
         private String projectName;
         private String message;
         private String timeStamp;
 
-        public BuildResult() {
+        public KrazipBuildResult() {
 
         }
 
-        public BuildResult(String projectName, String message, String timeStamp) {
+        public KrazipBuildResult(String projectName, String message, String timeStamp) {
             this.projectName = projectName;
             this.message = message;
             this.timeStamp = timeStamp;

@@ -34,7 +34,7 @@ public final class KrazipIrcConnection {
 
     public static synchronized KrazipIrcConnection establishInstance(String host, int port, String nickName, String userName, String realName, String channel, KrazipIRCPublisher krazip) {
         if ( instance == null ) {
-            instance = new KrazipIrcConnection(host, port, nickName, userName, realName, channel, new Listener( krazip ));
+            instance = new KrazipIrcConnection(host, port, nickName, userName, realName, channel, new KrazipIRCListener( krazip ));
         }
         return instance;
     }
