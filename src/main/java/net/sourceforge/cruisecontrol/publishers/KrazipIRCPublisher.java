@@ -64,12 +64,7 @@ public class KrazipIRCPublisher implements Publisher {
      */
     public final void publish(Element cruiseControlBuildLog) throws CruiseControlException {
         ensureIrcConnection();
-        if (KrazipIRCConnection.hasConnection()) {
-            log.info("Connection with IRC server : OK");
-            sendMessage(cruiseControlBuildLog);
-        } else {
-            log.error("Error: Can not find a connection to IRC server, try again on next build...");
-        }
+        sendMessage(cruiseControlBuildLog);
     }
 
     /**
