@@ -1,5 +1,8 @@
 package net.sourceforge.cruisecontrol.publishers;
 
+/**
+ * This is just a bean for keeping information about who following which project. This bean will be stored in <code>krazipFollowList</code> list
+ */
 public class KrazipFollowProject {
 
     private String projectName;

@@ -6,6 +6,9 @@ import org.schwering.irc.lib.IRCModeParser;
 import org.schwering.irc.lib.IRCUser;
 
 /**
+ * This is a class that implement the <code>IRCEventListener</code> In this case Krazip will handle the event <code>onPrivmsg</code>
+ * only. It's for krazip commands input from IRC
+ * <p/>
  * Implementation of IRCEventListener
  * <p/>
  * <i>Quote from <code>org.schwering.irc.lib.IRCEventListener</code></i>
@@ -20,7 +23,7 @@ import org.schwering.irc.lib.IRCUser;
  */
 
 public class KrazipIRCListener implements IRCEventListener {
-    
+
     private static final Logger log = Logger.getLogger(KrazipIRCListener.class);
     private final KrazipIRCPublisher krazipIRCPublisher;
 
@@ -34,10 +37,12 @@ public class KrazipIRCListener implements IRCEventListener {
 
     public void onError(String msg) {
         log.warn("Error: " + msg);
+        releaseConnection();
     }
 
     public void onError(int num, String msg) {
         log.warn("Error: " + num + " : " + msg);
+        releaseConnection();
     }
 
     public void onInvite(String chan, IRCUser user, String passiveNick) {
@@ -106,6 +111,11 @@ public class KrazipIRCListener implements IRCEventListener {
     public void unknown(String prefix, String command, String middle,
                         String trailing) {
         log.warn("Unknown: " + command);
+    }
+
+    public void releaseConnection() {
+        log.error("An error occurred. Releasing IRC connection and try connect again next build");
+        KrazipIRCConnection.destroyInstance();
     }
 
 }

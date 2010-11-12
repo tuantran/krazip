@@ -6,13 +6,14 @@ import org.schwering.irc.lib.IRCEventListener;
 
 import java.io.IOException;
 
-
+/**
+ * Thjs is a class that implementing Singleton pattern to ensure that Krazip only have one connection to IRC server.
+ */
 public final class KrazipIRCConnection {
 
     private static final Logger log = Logger.getLogger(KrazipIRCConnection.class);
-
     private static KrazipIRCConnection instance;
-    private IRCConnection realConnection;
+    private static IRCConnection realConnection;
 
     private KrazipIRCConnection(String host, int port, String nickName, String userName, String realName, String channel, IRCEventListener listener) {
         IRCConnection ircConnection = new IRCConnection(host, new int[]{port}, null, nickName, userName, realName);
@@ -44,5 +45,13 @@ public final class KrazipIRCConnection {
             throw new KrazipUsageException("You should always establish the instance before using it.");            
         }
         return instance.realConnection;
+    }
+
+    public static synchronized boolean hasConnection() {
+        return realConnection.isConnected();
+    }
+
+    public static synchronized void destroyInstance() {
+        instance = null;
     }
 }

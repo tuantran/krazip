@@ -1,82 +1,138 @@
               ----
               Krazip
               ----
+              Pongvech Vechprasit (pun@abctech-thailand.com)
+              ----
+              2010-11-12
+
+
+[images/Krazip_logo.png]
 
 Krazip Overview
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- Krazip is a simple CruiseControl plug-in for sending live build resultKrazip whether it pass, failed or fixed to IRC channel.
- It's developed on CruiseControl version 2.8.4 and use external irclib.jar for IRC communication library.
+ Krazip is a CruiseControl plug-in for sending live build result to IRC channel.
+ It also has functionality for interaction with user in IRC via commands. For instance, you can override the logging
+ level by type "krazip logging {new logging level}. Krazip will override the logging level found in config.xml file.
+ There are some other functionality that will be described later.
+
+ Krazip was developed on CruiseControl version 2.8.4 and use external irclib.jar for IRC communication library.
 
 [images/KrazipOverview.png]
+
+With Krazip installed on your CruiseControl you will be able to :
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ * Receive live build result from CruiseControl server via IRC message
+
+ * Config Krazip logging level to "Pass" to receive every build result, "Fail" for only fail and fixed build and "Off" to turn off the notification from Krazip completely
+
+ * Follow particular project. When you follow a project, you will receive every build message for that project, even the Krazip logging is turned off.
+ 
+ * Ask for the latest build result for particular project. Sometime you just need to know the state of the build, you can just type "krazip {projectName}"
+
+ []
+
+* Krazip Usage and Command in IRC
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ To interact with Krazip. You just type "krazip" follow by a command below. You also make it private by "/msg krazip \{command}"
+
+*---------------+---------------------------------------------------+----------------------------------------------------------------+
+| <<Command>>   | <<Description>>                                   | <<Example>>                                                    |
+*---------------+---------------------------------------------------+----------------------------------------------------------------+
+| help          | Display help message                              | <krazip help>                                                  |
+*---------------+---------------------------------------------------+----------------------------------------------------------------+
+| list          | List project and following project                | <krazip list>                                                  |
+*---------------+---------------------------------------------------+----------------------------------------------------------------+
+| projectName   | Display latest build result                       | <krazip someProjectName>                                       |
+*---------------+---------------------------------------------------+----------------------------------------------------------------+
+| logging       | Display or Override current Krazip logging level  | <krazip logging> or <krazip logging \{pass\}\{fail\}\{off\}>   |
+*---------------+---------------------------------------------------+----------------------------------------------------------------+
+| follow        | To follow a project                               | <krazip follow someProjectName>                                |
+*---------------+---------------------------------------------------+----------------------------------------------------------------+
+| unfollow      | To stop following a project                       | <krazip unfollow someProjectName>                              |
+*---------------+---------------------------------------------------+----------------------------------------------------------------
+ 
+=====================
 
 Krazip Installation on CruiseControl 2.8.4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* To install Krazip on a CruiseControl server you need a following
+ In short, to install Krazip you need threes things. First CruiseControl that running OK. Second, a Krazip library which is the heart of the Krazip. Finally, you need an IRClib library for IRC connection
+ which will be used by Krazip. Try to follow the steps below.
+
+* First, of course, you need a CruiseControl
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  * CruiseControl binary distribution version 2.8.4: {{http://cruisecontrol.sourceforge.net/}}
 
- * Krazip library
+ * Download and install it
 
- * IRClib library {{http://moepii.sourceforge.net/}}
+ * Make sure everything is work, and then go to next step
 
  []
 
-* To install Krazip please follow steps below.
+* Install Krazip on CruiseControl is very simple, please follow steps below
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * Go to lib folder in CruiseControl main folder.
+ * You need Krazip library (krazip\{version\}.jar) and IRClib library (irclib.jar)
 
- * You will see a lot of jar files insides.
+ * Next you just go to where you installed CruiseControl and enter "lib" folder
 
- * Copy Krazip and IRClib jar files into the folder
+ * Add both libraries to "lib" folder
 
- * You are done!(Please continue on configuration below)
+ * And you are done!(Now you need to configure it, please see in next section)
 
  []
 
 
 Krazip Configuration (config.xml)
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  First of all, because Krazip is not a bundled plug-in with CruiseControl. Therefore, you need to register it within config.xml file. Please see the example of plug-in registration below.
 
 +---
 <plugin name="krazip" classname="net.sourceforge.cruisecontrol.publishers.KrazipIRCPublisher"/>
 +---
 
- Here you go. Now the plug-in is registered. Now, next step is to configure the Krazip it self for IRC host address, channel etc.
+ The registration part comes right after the open <cruisecontrol> element.
 
- Krazip is the plug-in for sending build resultKrazip. Thus, It's a publisher plug-in. We will put the Krazip configuration element in <publishers> element. Please see below for more details.
+ Here you go. Now the plug-in is registered. Now, next step is to configure the Krazip it-self.
+
+ Krazip is the plug-in for sending build result. Therefore, the Krazip configration part is resides in <publisher> element. Please see below for more an example.
 
 +---
        <publishers>
-	   <krazip host="irc.linpro.no"
+	   <krazip
+	       host="irc.linpro.no"
 	       port="6667"
 	       channel="#krazip"
 	       resulturl="http://localhost:8080/cruisecontrol/buildresults/${project.name}" />
-            <onsuccess>
-                <artifactspublisher dest="artifacts/${project.name}" file="projects/${project.name}/target/${project.name}.jar"/>
-            </onsuccess>
+	       logginglevel="pass"
         </publishers>
 +---
 
 * There are some attributes you can config for Krazip
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * host - address for IRC server
+*---------------+-----------------------------------+----------------------------------------------------+
+| <<Attribute>> | <<Description>>                   | <<Note>>                                           |
+*---------------+-----------------------------------+----------------------------------------------------+
+| host          | URL for IRC server                | *Required*                                         |
+*---------------+-----------------------------------+----------------------------------------------------+
+| port          | IRC port                          | Default to 6667                                    |
+*---------------+-----------------------------------+----------------------------------------------------+
+| channel       | IRC channel for Krazip to publish | *Required*                                         |
+*---------------+-----------------------------------+----------------------------------------------------+
+| resulturl     | An URL for log file               | *Required*                                         |
+*---------------+-----------------------------------+----------------------------------------------------+
+| logginglevel  | Logging level for Krazip          | Can be "Pass", "Fail" or "off". Default is "Pass"  |
+*---------------+-----------------------------------+----------------------------------------------------
  
- * port - IRC port number (Default 6667)
 
- * channel - IRC channel for sending the build resultKrazip
- 
- * resulturl - This address will be appended with log address automatically. (http://www.someurl.com/someProjectName?log=log123456789)
- 
- []
 
- <<Example of full config.xml>> configured with Krazip (Used sample CruiseControl project "connectFour")
-
- <<Example of message for this configuration if build is OK>> : "Build completed successfully for project "someProjectname" Please see more details at _[http://www.someurl.com/someProjectName?log=log123456789
+* Example of config.xml configured Krazip to run with CruiseControl sample project
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 +---
 <cruisecontrol>
@@ -118,3 +174,5 @@ Krazip Configuration (config.xml)
     </project>
 </cruisecontrol>
 +---
+
+=====================

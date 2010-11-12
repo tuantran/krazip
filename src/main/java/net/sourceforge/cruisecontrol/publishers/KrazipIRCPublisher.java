@@ -53,7 +53,6 @@ public class KrazipIRCPublisher implements Publisher {
     private String channel;
     private String loggingLevel = FAIL; // pass, fail(including fixed), off
     private String buildResult;
-    private KrazipIRCConnection irc = null;
 
     /**
      * The main method for publishing build result into IRC. Firstly, initialize an IRC connection,
@@ -65,7 +64,12 @@ public class KrazipIRCPublisher implements Publisher {
      */
     public final void publish(Element cruiseControlBuildLog) throws CruiseControlException {
         ensureIrcConnection();
-        sendMessage(cruiseControlBuildLog);
+        if (KrazipIRCConnection.hasConnection()) {
+            log.info("Connection with IRC server : OK");
+            sendMessage(cruiseControlBuildLog);
+        } else {
+            log.error("Error: Can not find a connection to IRC server, try again on next build...");
+        }
     }
 
     /**
@@ -74,9 +78,7 @@ public class KrazipIRCPublisher implements Publisher {
      * @return IRCConnection return an IRC connection that uses for sending messages to IRC server
      */
     private IRCConnection ensureIrcConnection() {
-        if (irc == null) {
-            irc = KrazipIRCConnection.establishInstance(host, port, nickName, userName, realName, channel, this);
-        }
+        KrazipIRCConnection.establishInstance(host, port, nickName, userName, realName, channel, this);
         return KrazipIRCConnection.retrieveInstance();
     }
 
