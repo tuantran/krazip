@@ -109,6 +109,7 @@ Krazip Configuration (config.xml)
 	       channel="#krazip"
 	       resulturl="http://localhost:8080/cruisecontrol/buildresults/${project.name}" />
 	       logginglevel="pass"
+	       nickName="krazip"
         </publishers>
 +---
 
@@ -117,6 +118,8 @@ Krazip Configuration (config.xml)
 
 *---------------+-----------------------------------+----------------------------------------------------+
 | <<Attribute>> | <<Description>>                   | <<Note>>                                           |
+*---------------+-----------------------------------+----------------------------------------------------+
+| nickName      | Nick to use on the irc server     | Defaults to "krazip"                               |
 *---------------+-----------------------------------+----------------------------------------------------+
 | host          | URL for IRC server                | *Required*                                         |
 *---------------+-----------------------------------+----------------------------------------------------+
