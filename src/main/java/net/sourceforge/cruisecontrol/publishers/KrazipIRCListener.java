@@ -93,7 +93,7 @@ public class KrazipIRCListener implements IRCEventListener {
     }
 
     public void onQuit(IRCUser user, String msg) {
-        log.info("Quite: " + user + " " + msg);
+        log.info("Quit: " + user + " " + msg);
     }
 
     public void onRegistered() {
