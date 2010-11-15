@@ -199,6 +199,8 @@ public class KrazipIRCPublisher implements Publisher {
         String[] msgTmp = msg.split("\\s+");
         String scope = channel;
         String nickName = this.getNickName().toLowerCase();
+        msgTmp[0] = msgTmp[0].replace(',',' ');
+        msgTmp[0] = msgTmp[0].replace(':',' ');
         if (msgTmp[0].trim().toLowerCase().equals(nickName)) {
             if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
                 if (msgTmp[1].trim().equalsIgnoreCase(HELP)) {
