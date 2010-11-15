@@ -198,7 +198,8 @@ public class KrazipIRCPublisher implements Publisher {
     public void responsePrivateMessage(String sender, String msg) {
         String[] msgTmp = msg.split("\\s+");
         String scope = channel;
-        if (msgTmp[0].trim().toLowerCase().contains("krazip")) {
+        String nickName = this.getNickName().toLowerCase();
+        if (msgTmp[0].trim().toLowerCase().equals(nickName)) {
             if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
                 if (msgTmp[1].trim().equalsIgnoreCase(HELP)) {
                     sendBuildResult(null, null, scope); // Send help

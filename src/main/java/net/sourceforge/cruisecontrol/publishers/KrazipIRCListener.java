@@ -85,7 +85,8 @@ public class KrazipIRCListener implements IRCEventListener {
 
     public void onPrivmsg(String target, IRCUser user, String msg) {
         log.info("Private Message: " + target + " " + user + " " + msg);
-        if (!target.trim().equalsIgnoreCase("krazip")) {
+        String nickName = krazipIRCPublisher.getNickName();
+        if (!target.trim().equalsIgnoreCase(nickName)) {
             krazipIRCPublisher.responsePrivateMessage(user.toString(), msg);
         } else {
             krazipIRCPublisher.responsePrivatePrivateMessage(user.toString(), msg);
