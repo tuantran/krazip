@@ -91,6 +91,17 @@
                   <nohelp>true</nohelp>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <!-- Must use this version due to maven error in plugin version 2.2, which makes
+                  site building fail. Maybe this gets corrected in a later version of 2.2. -->
+                <version>2.1.2</version>
+                <configuration>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                    <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
