@@ -120,12 +120,12 @@ public class KrazipIRCPublisher implements Publisher {
         String projectName = ccBuildLog.getProjectName();
         String buildTimeStamp = ccBuildLog.getBuildTimestamp();
         String msg = "";
-        if (ccBuildLog.isBuildSuccessful()) {
+        if (ccBuildLog.isBuildFix()) {
+            buildResult = FIXED;
+            msg += "\"" + projectName + "\" build fixed";
+        } else if (ccBuildLog.isBuildSuccessful()) {
             buildResult = PASS;
             msg += "\"" + projectName + "\" build completed successfully.";
-        } else if (ccBuildLog.isBuildFix()) {
-            buildResult = FIXED;
-            msg += "\"" + projectName + "\" build fixed.";
         } else {
             buildResult = FAIL;
             msg += "\"" + projectName + "\" build failed. ";
