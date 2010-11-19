@@ -10,14 +10,19 @@
     <name>krazip</name>
 
 
+    <scm>
+        <connection>scm:git:ssh://apdm.int.abctech-thailand.com/opt/git/code/krazip.git</connection>
+        <url>http://apdm.dev.abctech-thailand.com/gitweb/?p=code/krazip.git</url>
+    </scm>
+
     <distributionManagement>
-        <!--<repository>
-            <id>api-repository</id>
-            <name>API Repository</name>
+        <repository>
+            <id>abctech-repository</id>
+            <name>Abctech Repository</name>
             <url>
-                scp://maven.api.no/usr/local/maven/repository
+                scp://apdm/var/www/maven
             </url>
-        </repository>-->
+        </repository>
         <site>
             <id>apdm.website</id>
             <name>apdm.website</name>
