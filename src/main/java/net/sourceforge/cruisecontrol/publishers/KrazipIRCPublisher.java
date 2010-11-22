@@ -446,18 +446,19 @@ public class KrazipIRCPublisher implements Publisher {
      * @param scope   message scope to be sent to IRC
      */
     public void setOverrideGlobalLoggingLevel(String setting, String sender, String scope) {
+        final String QUOTATION = "\"";
         if (setting.trim().equalsIgnoreCase(PASS) || setting.trim().equalsIgnoreCase(FAIL) ||
                 setting.trim().equalsIgnoreCase(OFF)) {
             if (KrazipOverrideGlobalLogging.getOverrideValue().equalsIgnoreCase(setting)) {
-                ensureIrcConnection().doPrivmsg(scope, "Current global logging level is already at" +
-                        " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() +
-                        "\". Keeping the current setting.");
+                ensureIrcConnection().doPrivmsg(scope, "Current global logging level is already at " +
+                        QUOTATION + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + QUOTATION +
+                        ". Keeping the current setting.");
             } else {
                 KrazipOverrideGlobalLogging.setOverrideValue(setting);
-                ensureIrcConnection().doPrivmsg(scope, "Global logging level has been overridden to :" +
-                        " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + "\" by " + sender);
-                log.info(sender + " has overridden global logging level to :" +
-                        " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + "\"");
+                ensureIrcConnection().doPrivmsg(scope, "Global logging level has been overridden to : " +
+                        QUOTATION + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + QUOTATION + " by " + sender);
+                log.info(sender + " has overridden global logging level to : " +
+                        QUOTATION + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + QUOTATION);
             }
 
         } else {
