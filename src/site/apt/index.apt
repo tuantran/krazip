@@ -179,4 +179,18 @@ Krazip Configuration (config.xml)
 </cruisecontrol>
 +---
 
-=====================
+Troubleshooting : Adding cruisecontrol.jar to local repository
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ When developing Krazip, we need a cruisecontrol.jar as it required by Maven. (In the pom.xml). This jar file could not be found in Maven
+ repository online. Therefore, we need to add the cruisecontrol.jar to local repo manually. Please follow the step below
+
+ * In command line, go to lib folder in CruiseControl. You will find cruisecontrol.jar
+
+ * Now we need to add the jar file into our local repository.
+
++---
+ mvn install:install-file -Dfile=cruisecontrol.jar -DgroupId=net.sourceforge.cruisecontrol -DartifactId=cruisecontrol -Dversion=2.8.4 -Dpackaging=jar
++---
+ 
+ * Done. You can build the project. :) 
+

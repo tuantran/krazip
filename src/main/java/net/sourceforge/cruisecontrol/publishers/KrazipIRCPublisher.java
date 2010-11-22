@@ -38,7 +38,7 @@ public class KrazipIRCPublisher implements Publisher {
     private static final String LOGGING = "logging";
     private static final String UNFOLLOW = "unfollow";
     private static final String FOLLOW = "follow";
-    private final String QUOTATION = "\"";
+    private static final String QUOTATION = "\"";
     private static final int ONE_ARGUMENT_PASSED = 1;
     private static final int TWO_ARGUMENTS_PASSED = 2;
     private static final int THREE_ARGUMENTS_PASSED = 3;
