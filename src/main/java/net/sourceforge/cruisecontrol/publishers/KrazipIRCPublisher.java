@@ -38,6 +38,7 @@ public class KrazipIRCPublisher implements Publisher {
     private static final String LOGGING = "logging";
     private static final String UNFOLLOW = "unfollow";
     private static final String FOLLOW = "follow";
+    private final String QUOTATION = "\"";
     private static final int ONE_ARGUMENT_PASSED = 1;
     private static final int TWO_ARGUMENTS_PASSED = 2;
     private static final int THREE_ARGUMENTS_PASSED = 3;
@@ -446,7 +447,7 @@ public class KrazipIRCPublisher implements Publisher {
      * @param scope   message scope to be sent to IRC
      */
     public void setOverrideGlobalLoggingLevel(String setting, String sender, String scope) {
-        final String QUOTATION = "\"";
+
         if (setting.trim().equalsIgnoreCase(PASS) || setting.trim().equalsIgnoreCase(FAIL) ||
                 setting.trim().equalsIgnoreCase(OFF)) {
             if (KrazipOverrideGlobalLogging.getOverrideValue().equalsIgnoreCase(setting)) {
