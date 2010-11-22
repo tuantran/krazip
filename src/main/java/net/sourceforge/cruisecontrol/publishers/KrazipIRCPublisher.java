@@ -192,15 +192,15 @@ public class KrazipIRCPublisher implements Publisher {
      * <li>[logging {PASS}{FAIL}{OFF}] - To override global logging level</li>
      * </ul>
      *
-     * @param sender  person tho send the message
-     * @param msg the message body
+     * @param sender person tho send the message
+     * @param msg    the message body
      */
     public void responsePrivateMessage(String sender, String msg) {
         String[] msgTmp = msg.split("\\s+");
         String scope = channel;
         String senderNickName = this.getNickName().toLowerCase().trim();
-        msgTmp[0] = msgTmp[0].replace(',',' ');
-        msgTmp[0] = msgTmp[0].replace(':',' ');
+        msgTmp[0] = msgTmp[0].replace(',', ' ');
+        msgTmp[0] = msgTmp[0].replace(':', ' ');
         if (msgTmp[0].equals(senderNickName)) {
             if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
                 if (msgTmp[1].trim().equalsIgnoreCase(HELP)) {
@@ -238,8 +238,8 @@ public class KrazipIRCPublisher implements Publisher {
      * <li>[logging {PASS}{FAIL}{OFF}] - To override global logging level</li>
      * </ul>
      *
-     * @param sender  person tho send the message
-     * @param msg the message body
+     * @param sender person tho send the message
+     * @param msg    the message body
      */
     public void responsePrivatePrivateMessage(String sender, String msg) {
         String[] msgTmp = msg.split("\\s+");
@@ -448,11 +448,18 @@ public class KrazipIRCPublisher implements Publisher {
     public void setOverrideGlobalLoggingLevel(String setting, String sender, String scope) {
         if (setting.trim().equalsIgnoreCase(PASS) || setting.trim().equalsIgnoreCase(FAIL) ||
                 setting.trim().equalsIgnoreCase(OFF)) {
-            KrazipOverrideGlobalLogging.setOverrideValue(setting);
-            ensureIrcConnection().doPrivmsg(scope, "Global logging level has been overridden to :" +
-                    " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + "\" by " + sender);
-            log.info(sender + " has overridden global logging level to :" +
-                    " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + "\"");
+            if (KrazipOverrideGlobalLogging.getOverrideValue().equalsIgnoreCase(setting)) {
+                ensureIrcConnection().doPrivmsg(scope, "Current global logging level is already at" +
+                        " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() +
+                        "\". Keeping the current setting.");
+            } else {
+                KrazipOverrideGlobalLogging.setOverrideValue(setting);
+                ensureIrcConnection().doPrivmsg(scope, "Global logging level has been overridden to :" +
+                        " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + "\" by " + sender);
+                log.info(sender + " has overridden global logging level to :" +
+                        " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + "\"");
+            }
+
         } else {
             ensureIrcConnection().doPrivmsg(sender, "Incorrect logging level : {" + PASS.toUpperCase() +
                     "} {" + FAIL.toUpperCase() + "} {" + OFF.toUpperCase() + "}");
@@ -478,9 +485,9 @@ public class KrazipIRCPublisher implements Publisher {
      * Find the build that matches the given project name.
      * <p> Scope is protected for the benefit of junit tests. </p>
      *
-     * @return The newest build with the given project name, or null if none were found.
      * @param krazipBuildList a list that contains a history build list
-     * @param projectName a project name that we going to search in krazipBuildList
+     * @param projectName     a project name that we going to search in krazipBuildList
+     * @return The newest build with the given project name, or null if none were found.
      */
     protected KrazipBuildResult findNewestBuildByName(List<KrazipBuildResult> krazipBuildList, String projectName) {
         List<KrazipBuildResult> reverse = new ArrayList<KrazipBuildResult>(krazipBuildList);
