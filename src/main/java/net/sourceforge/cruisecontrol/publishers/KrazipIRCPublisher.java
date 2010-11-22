@@ -192,16 +192,16 @@ public class KrazipIRCPublisher implements Publisher {
      * <li>[logging {PASS}{FAIL}{OFF}] - To override global logging level</li>
      * </ul>
      *
-     * @param sender
-     * @param msg
+     * @param sender  person tho send the message
+     * @param msg the message body
      */
     public void responsePrivateMessage(String sender, String msg) {
         String[] msgTmp = msg.split("\\s+");
         String scope = channel;
-        String nickName = this.getNickName().toLowerCase();
+        String senderNickName = this.getNickName().toLowerCase().trim();
         msgTmp[0] = msgTmp[0].replace(',',' ');
         msgTmp[0] = msgTmp[0].replace(':',' ');
-        if (msgTmp[0].trim().toLowerCase().equals(nickName)) {
+        if (msgTmp[0].equals(senderNickName)) {
             if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
                 if (msgTmp[1].trim().equalsIgnoreCase(HELP)) {
                     sendBuildResult(null, null, scope); // Send help
@@ -238,8 +238,8 @@ public class KrazipIRCPublisher implements Publisher {
      * <li>[logging {PASS}{FAIL}{OFF}] - To override global logging level</li>
      * </ul>
      *
-     * @param sender
-     * @param msg
+     * @param sender  person tho send the message
+     * @param msg the message body
      */
     public void responsePrivatePrivateMessage(String sender, String msg) {
         String[] msgTmp = msg.split("\\s+");
@@ -343,7 +343,7 @@ public class KrazipIRCPublisher implements Publisher {
             String projectName = krazipFollowList.get(i).getProjectName();
             String follower = krazipFollowList.get(i).getFollower();
             if (follower.equalsIgnoreCase(sender.trim())) {
-                msg.append("\"" + projectName + "\"");
+                msg.append("\"").append(projectName).append("\"");
                 if (i + 1 < krazipFollowList.size()) {
                     msg.append(", ");
                 } else {
@@ -378,7 +378,7 @@ public class KrazipIRCPublisher implements Publisher {
         Object[] toBeAdded = projects.toArray();
         for (int i = 0; i < toBeAdded.length; i++) {
             String projectName = toBeAdded[i].toString();
-            msg.append("\"" + projectName + "\"");
+            msg.append("\"").append(projectName).append("\"");
             if (i + 1 < toBeAdded.length) {
                 msg.append(", ");
             } else {
@@ -463,7 +463,7 @@ public class KrazipIRCPublisher implements Publisher {
     /**
      * Return current logging level to sender in IRC
      *
-     * @param scope
+     * @param scope the scope for sending the message back. (Back to sender only or send back to channel)
      */
     public void getOverrideGlobalLoggingLevel(String scope) {
         if (!KrazipOverrideGlobalLogging.getOverrideValue().equalsIgnoreCase("nothing")) {
@@ -479,6 +479,8 @@ public class KrazipIRCPublisher implements Publisher {
      * <p> Scope is protected for the benefit of junit tests. </p>
      *
      * @return The newest build with the given project name, or null if none were found.
+     * @param krazipBuildList a list that contains a history build list
+     * @param projectName a project name that we going to search in krazipBuildList
      */
     protected KrazipBuildResult findNewestBuildByName(List<KrazipBuildResult> krazipBuildList, String projectName) {
         List<KrazipBuildResult> reverse = new ArrayList<KrazipBuildResult>(krazipBuildList);
