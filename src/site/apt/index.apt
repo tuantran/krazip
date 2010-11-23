@@ -181,7 +181,7 @@ Krazip Configuration (config.xml)
 </cruisecontrol>
 +---
 
-Optional : Configure Krazip to report build participant with IRC username
+Optional : Configure Krazip to report build participant with IRC nickname
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  Normally when build failed, Krazip will report build result to IRC channel with message like below. You may don't want to do this if you already happy with the default behavior.
 
@@ -212,7 +212,7 @@ Optional : Configure Krazip to report build participant with IRC username
 
  From the example CruiseControl log above. Krazip will use pun@abctech-thailand.com as a build participant. However if email is not found, user will be used instead.
 
- If you want to use IRC username for reporting, you could mapping them with IRC username with krazip.properties file. The instruction is very easy. You just have to <<create the
+ If you want to use IRC nickname for reporting, you could mapping them with IRC nickname with krazip.properties file. The instruction is very easy. You just have to <<create the
 krazip.properties in CruiseControl root folder.>> Then add the mapping values like below.
 
 +---
