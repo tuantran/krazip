@@ -534,14 +534,14 @@ public class KrazipIRCPublisher implements Publisher {
                 log.info("Mapping name found for " + participant + ", as " + mappingName);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("ERROR : Error in mapping name : "+e.getMessage());
         } finally {
             try {
                 if (is != null) {
                     is.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("ERROR :  Error closing file stream : "+e.getMessage());
             }
         }
         return mappingName;
