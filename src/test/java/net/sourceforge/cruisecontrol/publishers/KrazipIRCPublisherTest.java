@@ -39,8 +39,8 @@ public class KrazipIRCPublisherTest {
         KrazipIRCPublisherTest publisherTest = new KrazipIRCPublisherTest();
         Element cruiseControlBuildLog = publisherTest.createcruiseControlBuildLog(false);
         Assert.assertEquals
-                ("\"someProjectname\" build failed. Includes changes by someEmail@someHost.com, " +
-                        "someEmail2@someHost.com. (" +
+                ("\"someProjectname\" build failed. Includes changes by someUser, " +
+                        "someUser2. (" +
                         "http://www.someurl.com/someProjectName?log=log123456789)",
                         publisher.buildMessage(cruiseControlBuildLog));
     }

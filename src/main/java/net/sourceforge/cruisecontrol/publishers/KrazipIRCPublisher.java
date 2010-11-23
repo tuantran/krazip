@@ -9,11 +9,15 @@ import org.jdom.Element;
 import org.schwering.irc.lib.IRCConnection;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -39,6 +43,7 @@ public class KrazipIRCPublisher implements Publisher {
     private static final String UNFOLLOW = "unfollow";
     private static final String FOLLOW = "follow";
     private static final String QUOTATION = "\"";
+    private static final String KRAZIP_PROPERTY_FILE = "krazip.properties";
     private static final int ONE_ARGUMENT_PASSED = 1;
     private static final int TWO_ARGUMENTS_PASSED = 2;
     private static final int THREE_ARGUMENTS_PASSED = 3;
@@ -135,7 +140,10 @@ public class KrazipIRCPublisher implements Publisher {
             Iterator<String> iter = changeSet.iterator();
             StringBuilder sb = new StringBuilder();
             while (iter.hasNext()) {
-                sb.append(iter.next());
+                log.info("Getting build participants list...");
+                String participant = iter.next();
+                String nameMapping = readNickFromMapping(participant);
+                sb.append(nameMapping);
                 if (iter.hasNext()) {
                     sb.append(", ");
                 }
@@ -500,6 +508,43 @@ public class KrazipIRCPublisher implements Publisher {
             }
         }
         return null;
+    }
+
+    /**
+     * Look up participant mapping name with IRC user name in Krazip properties file
+     *
+     * @param participant key name to look in mapping file
+     * @return IRC nick mapping to participant name if found
+     */
+    protected String readNickFromMapping(String participant) {
+        String mappingName = participant;
+        InputStream is = null;
+        try {
+            log.info("Reading Krazip properties file...");
+            File propertyFile = new File(KRAZIP_PROPERTY_FILE);
+            if ( ! propertyFile.exists()) {
+                log.error("ERROR : krazip.properties file not found");
+                return mappingName;
+            }
+            is = new FileInputStream(propertyFile);
+            Properties properties = new Properties();
+            properties.load(is);
+            if (properties.containsKey(participant)) {
+                mappingName = properties.getProperty(participant);
+                log.info("Mapping name found for " + participant + ", as " + mappingName);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return mappingName;
     }
 
     /**
