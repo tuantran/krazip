@@ -523,7 +523,7 @@ public class KrazipIRCPublisher implements Publisher {
             log.info("Reading Krazip properties file...");
             File propertyFile = new File(KRAZIP_PROPERTY_FILE);
             if ( ! propertyFile.exists()) {
-                log.error("ERROR : krazip.properties file not found");
+                log.info("INFO : krazip.properties file not found, not using name mapping");
                 return mappingName;
             }
             is = new FileInputStream(propertyFile);
