@@ -145,7 +145,7 @@ public class KrazipIRCPublisher implements Publisher {
             msg += ".";
         }
         krazipBuildList.add(new KrazipBuildResult(projectName, msg, buildTimeStamp));
-        log.info("buildResult added to krazipBuildList, Total item : " + krazipBuildList.size());
+        log.info("buildResult added to krazipBuildList, Total number of items : " + krazipBuildList.size());
         sendMessageToFollower(projectName, msg);
         log.info("Sending build result to follower...");
         return msg;
@@ -319,7 +319,7 @@ public class KrazipIRCPublisher implements Publisher {
             }
         } else {
             sendBuildResult(null, requestedProjectName, sender);
-            log.info(sender + " is trying to follow not existing project : " + requestedProjectName);
+            log.info(sender + " is trying to follow a non-existing project : " + requestedProjectName);
         }
     }
 
@@ -337,10 +337,10 @@ public class KrazipIRCPublisher implements Publisher {
             log.info("krazipFollowList = " + projectName + " : " + follower);
             if (projectName.equalsIgnoreCase(requestedProjectName.trim()) && follower.equalsIgnoreCase(sender.trim())) {
                 krazipFollowList.remove(i);
-                ensureIrcConnection().doPrivmsg(sender, "You are stop following project \"" + projectName + "\"");
+                ensureIrcConnection().doPrivmsg(sender, "You have stopped following project \"" + projectName + "\"");
                 log.info("krazipFollowList = " + projectName + " : " + follower + " (DELETED) size=" +
                         krazipFollowList.size());
-                log.info(sender + " is stop following " + projectName);
+                log.info(sender + " has stopped following " + projectName);
                 found = true;
                 break;
             }
@@ -411,8 +411,8 @@ public class KrazipIRCPublisher implements Publisher {
             ensureIrcConnection().doPrivmsg(sender, msg.toString());
             log.info(msg.toString());
         } else {
-            ensureIrcConnection().doPrivmsg(sender, "CruiseControl haven't build any project since last re-started");
-            log.info("Can't list project : CruiseControl haven't build any project since last re-started");
+            ensureIrcConnection().doPrivmsg(sender, "CruiseControl has not built any projects since last re-start.");
+            log.info("Can't list project : CruiseControl has not built any projects since last re-start");
         }
     }
 
