@@ -1,4 +1,3 @@
-TEST
 package net.sourceforge.cruisecontrol.publishers;
 
 import net.sourceforge.cruisecontrol.CruiseControlException;
