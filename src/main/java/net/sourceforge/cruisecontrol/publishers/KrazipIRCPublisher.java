@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -55,7 +54,7 @@ public class KrazipIRCPublisher implements Publisher {
     private String nickName = "Krazip";
     private String userName = "Krazip";
     private String realName = "Krazip CruiseControl IRC publisher";
-    private String resultURL;
+    private String resultURL = "";
     private String channel;
     private String loggingLevel = FAIL; // pass, fail(including fixed), off
     private String buildResult;
@@ -128,36 +127,50 @@ public class KrazipIRCPublisher implements Publisher {
         String msg = "";
         if (ccBuildLog.isBuildFix()) {
             buildResult = FIXED;
-            msg += "\"" + projectName + "\" build fixed";
+            msg += "\"" + projectName + "\" build fixed. ";
+            msg += "Includes changes by ";
+            msg += retrieveBuildParticipant(ccBuildLog);
         } else if (ccBuildLog.isBuildSuccessful()) {
             buildResult = PASS;
-            msg += "\"" + projectName + "\" build completed successfully.";
+            msg += "\"" + projectName + "\" build completed successfully";
         } else {
             buildResult = FAIL;
             msg += "\"" + projectName + "\" build failed. ";
             msg += "Includes changes by ";
-            Set<String> changeSet = ccBuildLog.getBuildParticipants();
-            Iterator<String> iter = changeSet.iterator();
-            StringBuilder sb = new StringBuilder();
-            while (iter.hasNext()) {
-                log.info("Getting build participants list...");
-                String participant = iter.next();
-                String nameMapping = readNickFromMapping(participant);
-                sb.append(nameMapping);
-                if (iter.hasNext()) {
-                    sb.append(", ");
-                }
-            }
-            msg += sb.toString();
+            msg += retrieveBuildParticipant(ccBuildLog);
         }
-        if (!buildResult.equals(PASS)) {
+        if (buildResult.equals(FAIL) && !resultURL.equals("")) {
             msg += ". (" + getResultURL(ccBuildLog) + ")";
+        } else {
+            msg += ".";
         }
         krazipBuildList.add(new KrazipBuildResult(projectName, msg, buildTimeStamp));
         log.info("buildResult added to krazipBuildList, Total item : " + krazipBuildList.size());
         sendMessageToFollower(projectName, msg);
         log.info("Sending build result to follower...");
         return msg;
+    }
+
+    /**
+     * Get build participants from build log
+     * @param ccBuildLog A CruiseControl build log
+     * @return String A list of build participant
+     */
+    protected String retrieveBuildParticipant(XMLLogHelper ccBuildLog) {
+        log.info("Getting build participants list...");
+        Set<String> changeSet = ccBuildLog.getBuildParticipants();
+        int i = 1;
+        StringBuilder sb = new StringBuilder();
+        for (String name : changeSet) {
+            log.info(changeSet.size() + " build participant(s) found...");
+            String nameMapping = readNickFromMapping(name);
+            sb.append(nameMapping);
+            if (i < changeSet.size()) {
+                sb.append(", ");
+                i++;
+            }
+        }
+        return sb.toString();
     }
 
     /**
@@ -207,10 +220,10 @@ public class KrazipIRCPublisher implements Publisher {
     public void responsePrivateMessage(String sender, String msg) {
         String[] msgTmp = msg.split("\\s+");
         String scope = channel;
-        String senderNickName = this.getNickName().toLowerCase().trim();
+        String senderNickName = this.getNickName().trim();
         msgTmp[0] = msgTmp[0].replace(',', ' ');
         msgTmp[0] = msgTmp[0].replace(':', ' ');
-        if (msgTmp[0].equals(senderNickName)) {
+        if (msgTmp[0].equalsIgnoreCase(senderNickName)) {
             if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
                 if (msgTmp[1].trim().equalsIgnoreCase(HELP)) {
                     sendBuildResult(null, null, scope); // Send help
@@ -522,7 +535,7 @@ public class KrazipIRCPublisher implements Publisher {
         try {
             log.info("Reading Krazip properties file...");
             File propertyFile = new File(KRAZIP_PROPERTY_FILE);
-            if ( ! propertyFile.exists()) {
+            if (!propertyFile.exists()) {
                 log.info("INFO : krazip.properties file not found, not using name mapping");
                 return mappingName;
             }
@@ -534,14 +547,14 @@ public class KrazipIRCPublisher implements Publisher {
                 log.info("Mapping name found for " + participant + ", as " + mappingName);
             }
         } catch (IOException e) {
-            log.error("ERROR : Error in mapping name : "+e.getMessage());
+            log.error("ERROR : Error in mapping name : " + e.getMessage());
         } finally {
             try {
                 if (is != null) {
                     is.close();
                 }
             } catch (IOException e) {
-                log.error("ERROR :  Error closing file stream : "+e.getMessage());
+                log.error("ERROR :  Error closing file stream : " + e.getMessage());
             }
         }
         return mappingName;
@@ -557,7 +570,6 @@ public class KrazipIRCPublisher implements Publisher {
         ValidationHelper.assertIsSet(nickName, "nickName", this.getClass());
         ValidationHelper.assertIsSet(userName, "userName", this.getClass());
         ValidationHelper.assertIsSet(channel, "channel", this.getClass());
-        ValidationHelper.assertIsSet(resultURL, "resultURL", this.getClass());
         ValidationHelper.assertIsSet(loggingLevel, "loggingLevel", this.getClass());
     }
 
