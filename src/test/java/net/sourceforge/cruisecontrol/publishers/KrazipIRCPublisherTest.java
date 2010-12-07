@@ -46,20 +46,7 @@ public class KrazipIRCPublisherTest {
     }
 
     @Test
-    public void testValidatePass() throws Exception {
-        publisher = new KrazipIRCPublisher();
-        publisher.setHost("irc.somehost.com");
-        publisher.setChannel("#someChannel");
-        publisher.setResultURL("http://www.someurl.com/");
-        try {
-            publisher.validate();
-        } catch (CruiseControlException e) {
-            Assert.fail("must NOT throw exception if everything are set");
-        }
-    }
-
-    @Test
-    public void testValidateFail() throws Exception {
+    public void testValidate() throws Exception {
         publisher = new KrazipIRCPublisher();
         try {
             publisher.validate();

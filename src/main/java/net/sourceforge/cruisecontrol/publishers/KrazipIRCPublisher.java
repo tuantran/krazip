@@ -153,6 +153,7 @@ public class KrazipIRCPublisher implements Publisher {
 
     /**
      * Get build participants from build log
+     *
      * @param ccBuildLog A CruiseControl build log
      * @return String A list of build participant
      */
@@ -295,31 +296,24 @@ public class KrazipIRCPublisher implements Publisher {
      * @param sender               a user that requested to follow
      */
     public void followProject(String requestedProjectName, String sender) {
-        KrazipBuildResult krazipBuildResult = findNewestBuildByName(krazipBuildList, requestedProjectName);
-        if (krazipBuildResult != null && krazipBuildResult.getProjectName() != null) {
-            boolean alreadyFollow = false;
-            for (KrazipFollowProject aKrazipFollowList : krazipFollowList) {
-                String projectNameTmp = aKrazipFollowList.getProjectName();
-                String followerTmp = aKrazipFollowList.getFollower();
-                if (projectNameTmp.equalsIgnoreCase(requestedProjectName.trim()) &&
-                        followerTmp.equalsIgnoreCase(sender.trim())) {
-                    ensureIrcConnection().doPrivmsg(sender, "You are already following project \"" +
-                            projectNameTmp + "\"");
-                    log.info(sender + " is already following " + projectNameTmp);
-                    alreadyFollow = true;
-                }
+        boolean alreadyFollow = false;
+        for (KrazipFollowProject aKrazipFollowList : krazipFollowList) {
+            String projectNameTmp = aKrazipFollowList.getProjectName();
+            String followerTmp = aKrazipFollowList.getFollower();
+            if (projectNameTmp.equalsIgnoreCase(requestedProjectName.trim()) &&
+                    followerTmp.equalsIgnoreCase(sender.trim())) {
+                ensureIrcConnection().doPrivmsg(sender, "You are already following project \"" +
+                        projectNameTmp + "\"");
+                log.info(sender + " is already following " + projectNameTmp);
+                alreadyFollow = true;
             }
-            if (!alreadyFollow) {
-                String projectName = krazipBuildResult.getProjectName();
-                krazipFollowList.add(new KrazipFollowProject(projectName, sender));
-                ensureIrcConnection().doPrivmsg(sender, "You are now following project \"" + projectName + "\"");
-                log.info("krazipFollowList = " + projectName + " : " + sender + " (ADDED) size=" +
-                        krazipFollowList.size());
-                log.info(sender + " is now following " + projectName);
-            }
-        } else {
-            sendBuildResult(null, requestedProjectName, sender);
-            log.info(sender + " is trying to follow a non-existing project : " + requestedProjectName);
+        }
+        if (!alreadyFollow) {
+            krazipFollowList.add(new KrazipFollowProject(requestedProjectName, sender));
+            ensureIrcConnection().doPrivmsg(sender, "You are now following project \"" + requestedProjectName + "\"");
+            log.info("krazipFollowList = " + requestedProjectName + " : " + sender + " (ADDED) size=" +
+                    krazipFollowList.size());
+            log.info(sender + " is now following " + requestedProjectName);
         }
     }
 
@@ -411,8 +405,8 @@ public class KrazipIRCPublisher implements Publisher {
             ensureIrcConnection().doPrivmsg(sender, msg.toString());
             log.info(msg.toString());
         } else {
-            ensureIrcConnection().doPrivmsg(sender, "CruiseControl has not built any projects since last re-start.");
-            log.info("Can't list project : CruiseControl has not built any projects since last re-start");
+            ensureIrcConnection().doPrivmsg(sender, "CruiseControl has not built any projects since started.");
+            log.info("Can't list project : CruiseControl has not built any projects since started");
         }
     }
 
@@ -571,6 +565,7 @@ public class KrazipIRCPublisher implements Publisher {
         ValidationHelper.assertIsSet(userName, "userName", this.getClass());
         ValidationHelper.assertIsSet(channel, "channel", this.getClass());
         ValidationHelper.assertIsSet(loggingLevel, "loggingLevel", this.getClass());
+        ensureIrcConnection();
     }
 
     public final String getChannel() {
