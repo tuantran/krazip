@@ -222,8 +222,8 @@ public class KrazipIRCPublisher implements Publisher {
         String[] msgTmp = msg.split("\\s+");
         String scope = channel;
         String senderNickName = this.getNickName().trim();
-        msgTmp[0] = msgTmp[0].replace(',', ' ');
-        msgTmp[0] = msgTmp[0].replace(':', ' ');
+        msgTmp[0] = msgTmp[0].replace(',', ' ').trim();
+        msgTmp[0] = msgTmp[0].replace(':', ' ').trim();
         if (msgTmp[0].equalsIgnoreCase(senderNickName)) {
             if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
                 if (msgTmp[1].trim().equalsIgnoreCase(HELP)) {

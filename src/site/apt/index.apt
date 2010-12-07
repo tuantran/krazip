@@ -62,8 +62,7 @@ With Krazip installed on your CruiseControl you will be able to :
 Krazip Installation on CruiseControl 2.8.4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- In short, to install Krazip you need threes things. First CruiseControl that running OK. Second, a Krazip library which is the heart of the Krazip. Finally, you need an IRClib library for IRC connection
- which will be used by Krazip. Try to follow the steps below.
+ In short, to install Krazip you need threes things. First CruiseControl that running OK. Second, a Krazip library which is the heart of the Krazip. Try to follow the steps below.
 
 * First, of course, you need a CruiseControl
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,11 +78,11 @@ Krazip Installation on CruiseControl 2.8.4
 * Install Krazip on CruiseControl is very simple, please follow steps below
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * You need Krazip library (krazip\{version\}.jar) and IRClib library (irclib.jar)
+ * You need Krazip library (krazip\{version\}.jar)
 
  * Next you just go to where you installed CruiseControl and enter "lib" folder
 
- * Add both libraries to "lib" folder
+ * Add Krazip library to "lib" folder
 
  * And you are done!(Now you need to configure it, please see in next section)
 
