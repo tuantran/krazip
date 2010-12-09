@@ -6,7 +6,7 @@ import java.util.List;
 
 public class MockKrazipIRCPublisher extends KrazipIRCPublisher {
 
-    public static MockIRCConnection mockConn = null;
+    private MockIRCConnection mockConn = null;
 
     public MockKrazipIRCPublisher () {
         mockConn = new MockIRCConnection();

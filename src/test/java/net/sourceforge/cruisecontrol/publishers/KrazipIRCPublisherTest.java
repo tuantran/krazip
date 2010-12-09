@@ -114,18 +114,34 @@ public class KrazipIRCPublisherTest {
     @Test
     public void testResponsePrivateMsgLogging() throws Exception {
         List<String> messageLog;
+        Element cruiseControlBuildLog = new KrazipIRCPublisherTest().createcruiseControlBuildLog(PASS);
         MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
         KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest logging");
         messageLog = mockPublisher.getMessageLog();
         Assert.assertEquals("PRIVMSG testChannel :Global logging level is : \"PASS\"", messageLog.get(0));
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest logging off");
-        Assert.assertEquals(OFF, KrazipOverrideGlobalLogging.getOverrideValue());
+        Assert.assertEquals("PRIVMSG testChannel :Global logging level has been overridden to : \"OFF\" by testNick", messageLog.get(1));
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest logging pass");
+        mockPublisher.publish(cruiseControlBuildLog);
+        Assert.assertEquals("PRIVMSG testChannel :\"someProjectname\" build completed successfully.", messageLog.get(3));
+    }
+
+    @Test
+    public void testResponsePrivateMsgProject() throws Exception {
+        List<String> messageLog;
+        Element cruiseControlBuildLog = new KrazipIRCPublisherTest().createcruiseControlBuildLog(PASS);
+        MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
+        KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest someProjectname");
+        messageLog = mockPublisher.getMessageLog();
+        Assert.assertEquals("PRIVMSG testChannel :\"someProjectname\" build completed successfully.", messageLog.get(0));
     }
 
     @Test
     public void testResponsePrivateMsgFollow() throws Exception {
         List<String> messageLog;
+        Element cruiseControlBuildLog = new KrazipIRCPublisherTest().createcruiseControlBuildLog(PASS);
         MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
         KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest follow krazip");
@@ -133,6 +149,15 @@ public class KrazipIRCPublisherTest {
         messageLog = mockPublisher.getMessageLog();
         Assert.assertEquals("PRIVMSG testNick :You are now following project \"krazip\"", messageLog.get(0));
         Assert.assertEquals("PRIVMSG testNick :You have stopped following project \"krazip\"", messageLog.get(1));
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest follow krazip");
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest follow krazip");
+        Assert.assertEquals("PRIVMSG testNick :You are already following project \"krazip\"", messageLog.get(3));
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest follow something1");
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest follow someProjectname");
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest list");
+        Assert.assertEquals("PRIVMSG testNick :You are following : \"krazip\", \"something1\", \"someProjectname\".", messageLog.get(7));
+        mockPublisher.publish(cruiseControlBuildLog);
+        Assert.assertEquals("PRIVMSG testNick :\"someProjectname\" build completed successfully.", messageLog.get(8));
     }
 
     @Test
@@ -140,37 +165,9 @@ public class KrazipIRCPublisherTest {
         List<String> messageLog;
         MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
         KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
-        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest unfollow krazip");
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest unfollow something");
         messageLog = mockPublisher.getMessageLog();
-        Assert.assertEquals("PRIVMSG testNick :You are currently not following project \"krazip\"", messageLog.get(0));
-    }
-
-    @Test
-    public void testBuildMessage() throws Exception {
-        publisher = new KrazipIRCPublisher();
-        publisher.setHost("irc.somehost.com");
-        publisher.setChannel("#someChannel");
-        publisher.setResultURL("http://www.someurl.com/someProjectName");
-        KrazipIRCPublisherTest publisherTest = new KrazipIRCPublisherTest();
-        Element cruiseControlBuildLog = publisherTest.createcruiseControlBuildLog(PASS);
-        Assert.assertEquals
-                ("\"someProjectname\" build completed successfully." ,
-                        publisher.buildMessage(cruiseControlBuildLog));
-    }
-
-    @Test
-    public void testBuildFailMessage() throws Exception {
-        publisher = new KrazipIRCPublisher();
-        publisher.setHost("irc.somehost.com");
-        publisher.setChannel("#someChannel");
-        publisher.setResultURL("http://www.someurl.com/someProjectName");
-        KrazipIRCPublisherTest publisherTest = new KrazipIRCPublisherTest();
-        Element cruiseControlBuildLog = publisherTest.createcruiseControlBuildLog(FAIL);
-        Assert.assertEquals
-                ("\"someProjectname\" build failed. Includes changes by someUser, " +
-                        "someUser2. (" +
-                        "http://www.someurl.com/someProjectName?log=log123456789)",
-                        publisher.buildMessage(cruiseControlBuildLog));
+        Assert.assertEquals("PRIVMSG testNick :You are currently not following project \"something\"", messageLog.get(0));
     }
 
     @Test

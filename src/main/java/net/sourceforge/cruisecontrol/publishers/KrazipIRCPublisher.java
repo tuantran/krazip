@@ -221,10 +221,10 @@ public class KrazipIRCPublisher implements Publisher {
     public void responsePrivateMessage(String sender, String msg) {
         String[] msgTmp = msg.split("\\s+");
         String scope = channel;
-        String senderNickName = this.getNickName().trim();
+        String krazipNickname = this.getNickName().trim();
         msgTmp[0] = msgTmp[0].replace(',', ' ').trim();
         msgTmp[0] = msgTmp[0].replace(':', ' ').trim();
-        if (msgTmp[0].equalsIgnoreCase(senderNickName)) {
+        if (msgTmp[0].equalsIgnoreCase(krazipNickname)) {
             if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
                 if (msgTmp[1].trim().equalsIgnoreCase(HELP)) {
                     sendBuildResult(null, null, scope); // Send help
@@ -449,7 +449,7 @@ public class KrazipIRCPublisher implements Publisher {
                 // Requested projectName not found in ArrayList
                 ensureIrcConnection().doPrivmsg(scope, "Project name \"" + requestedProjectName +
                         "\" not found or it haven't been built" +
-                        " since CruiseControl last re-started (type \"krazip help\" for help)");
+                        " since CruiseControl started (type \"krazip help\" for help)");
             }
         }
     }
