@@ -56,6 +56,39 @@ public class KrazipIRCPublisherTest {
     }
 
     @Test
+    public void testLoggingLevelFailWithPassResult() throws Exception {
+        List<String> messageLog;
+        Element cruiseControlBuildLog = new KrazipIRCPublisherTest().createcruiseControlBuildLog(PASS);
+        MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
+        mockPublisher.setLoggingLevel("fail");
+        mockPublisher.publish(cruiseControlBuildLog);
+        messageLog = mockPublisher.getMessageLog();
+        Assert.assertEquals(0, messageLog.size());
+    }
+
+    @Test
+    public void testLoggingLevelFailWithFailResult() throws Exception {
+        List<String> messageLog;
+        Element cruiseControlBuildLog = new KrazipIRCPublisherTest().createcruiseControlBuildLog(FAIL);
+        MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
+        mockPublisher.setLoggingLevel("fail");
+        mockPublisher.publish(cruiseControlBuildLog);
+        messageLog = mockPublisher.getMessageLog();
+        Assert.assertEquals(1, messageLog.size());
+    }
+
+    @Test
+    public void testLoggingLevelOff() throws Exception {
+        List<String> messageLog;
+        Element cruiseControlBuildLog = new KrazipIRCPublisherTest().createcruiseControlBuildLog(PASS);
+        MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
+        mockPublisher.setLoggingLevel("fail");
+        mockPublisher.publish(cruiseControlBuildLog);
+        messageLog = mockPublisher.getMessageLog();
+        Assert.assertEquals(0, messageLog.size());
+    }
+
+    @Test
     public void testBuildMessage() throws Exception {
         publisher = new KrazipIRCPublisher();
         publisher.setHost("irc.somehost.com");
