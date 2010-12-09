@@ -107,7 +107,7 @@ public class KrazipIRCPublisherTest {
         KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest list");
         messageLog = mockPublisher.getMessageLog();
-        Assert.assertEquals("PRIVMSG testNick :CruiseControl has not built any projects since started.", messageLog.get(0));
+        Assert.assertEquals("PRIVMSG testNick :Project list : \"someProjectname\".", messageLog.get(0));
         Assert.assertEquals("PRIVMSG testNick :You are not following any project", messageLog.get(1));
     }
 

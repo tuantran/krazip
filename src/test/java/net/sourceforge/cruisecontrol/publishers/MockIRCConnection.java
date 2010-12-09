@@ -8,10 +8,11 @@ import java.util.List;
 
 public class MockIRCConnection extends IRCConnection {
     private static final Logger log = Logger.getLogger(MockIRCConnection.class);
-    private List<String> messageLog = new ArrayList<String>();
+    private List<String> messageLog;
 
     public MockIRCConnection() {
         super("localhost", new int[]{6667}, "mock", "mockNick", "junit", "test");
+        messageLog = new ArrayList<String>();
     }
 
     public List<String> getMessageLog() {
