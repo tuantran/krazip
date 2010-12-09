@@ -134,8 +134,9 @@ public class KrazipIRCPublisherTest {
         MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
         KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest someProjectname");
+        mockPublisher.publish(cruiseControlBuildLog);
         messageLog = mockPublisher.getMessageLog();
-        Assert.assertEquals("PRIVMSG testChannel :\"someProjectname\" build completed successfully.", messageLog.get(0));
+        Assert.assertEquals("PRIVMSG testChannel :\"someProjectname\" build completed successfully.", messageLog.get(1));
     }
 
     @Test

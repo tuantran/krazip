@@ -204,18 +204,9 @@ public class KrazipIRCPublisher implements Publisher {
     }
 
     /**
-     * Response to a private message. Krazip expecting commands : [help], [list],  [follow {projectName}], [unfollow {projectName}],
-     * [logging] and [logging {PASS}{FAIL}{OFF}]
-     * <ul>
-     * <li>[help] - For display help message</li>
-     * <li>[list] - To display project list and project that requester currently following</li>
-     * <li>[follow {projectName}] - To follow a project</li>
-     * <li>[unfollow {projectName}] - To unfollow a project</li>
-     * <li>[logging] - To display current logging level</li>
-     * <li>[logging {PASS}{FAIL}{OFF}] - To override global logging level</li>
-     * </ul>
+     * Response to a private message.
      *
-     * @param sender person tho send the message
+     * @param sender person who send the message
      * @param msg    the message body
      */
     public void responsePrivateMessage(String sender, String msg) {
@@ -226,66 +217,70 @@ public class KrazipIRCPublisher implements Publisher {
         msgTmp[0] = msgTmp[0].replace(':', ' ').trim();
         if (msgTmp[0].equalsIgnoreCase(krazipNickname)) {
             if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
-                if (msgTmp[1].trim().equalsIgnoreCase(HELP)) {
-                    sendBuildResult(null, null, scope); // Send help
-                } else if (msgTmp[1].trim().equalsIgnoreCase(LIST)) {
-                    listProject(sender);
-                    listFollowingProject(sender);
-                } else if (msgTmp[1].trim().equalsIgnoreCase(LOGGING)) {
-                    getOverrideGlobalLoggingLevel(scope);
-                } else {
-                    sendBuildResult(findNewestBuildByName(krazipBuildList, msgTmp[1]), msgTmp[1], scope);
-                }
+                treatSimpleCommand(sender, msgTmp[1].trim(), scope);
             } else if (msgTmp.length == THREE_ARGUMENTS_PASSED) {
-                if (msgTmp[1].trim().equalsIgnoreCase(FOLLOW)) {
-                    followProject(msgTmp[2], sender);
-                } else if (msgTmp[1].trim().equalsIgnoreCase(UNFOLLOW)) {
-                    unfollowProject(msgTmp[2], sender);
-                } else if (msgTmp[1].trim().equalsIgnoreCase(LOGGING)) {
-                    setOverrideGlobalLoggingLevel(msgTmp[2], sender, scope);
-                }
+                treatComplexCommand(sender, msgTmp[1].trim(),msgTmp[2].trim());
             }
         }
     }
 
     /**
-     * Response to a <i>private</i> (Eg. "/msg krazip logging off") private message. Krazip expecting commands : [help], [list],
-     * [follow {projectName}], [unfollow {projectName}],
-     * [logging] and [logging {PASS}{FAIL}{OFF}]
-     * <ul>
-     * <li>[help] - For display help message</li>
-     * <li>[list] - To display project list and project that requester currently following</li>
-     * <li>[follow {projectName}] - To follow a project</li>
-     * <li>[unfollow {projectName}] - To unfollow a project</li>
-     * <li>[logging] - To display current logging level</li>
-     * <li>[logging {PASS}{FAIL}{OFF}] - To override global logging level</li>
-     * </ul>
+     * Response to a <i>private</i> (Eg. "/msg krazip logging off") private message.
      *
-     * @param sender person tho send the message
+     * @param sender person who send the message
      * @param msg    the message body
      */
     public void responsePrivatePrivateMessage(String sender, String msg) {
         String[] msgTmp = msg.split("\\s+");
-        String scope = channel;
         if (msgTmp.length == ONE_ARGUMENT_PASSED) {
-            if (msgTmp[0].trim().equalsIgnoreCase(HELP)) {
-                sendBuildResult(null, null, sender); // Send help
-            } else if (msgTmp[0].trim().equalsIgnoreCase(LIST)) {
-                listProject(sender);
-                listFollowingProject(sender);
-            } else if (msgTmp[0].trim().equalsIgnoreCase(LOGGING)) {
-                getOverrideGlobalLoggingLevel(sender);
-            } else {
-                sendBuildResult(findNewestBuildByName(krazipBuildList, msgTmp[0]), msgTmp[0], sender);
-            }
+            treatSimpleCommand(sender, msgTmp[0].trim(), sender);
         } else if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
-            if (msgTmp[0].trim().equalsIgnoreCase(FOLLOW)) {
-                followProject(msgTmp[1], sender);
-            } else if (msgTmp[0].trim().equalsIgnoreCase(UNFOLLOW)) {
-                unfollowProject(msgTmp[1], sender);
-            } else if (msgTmp[0].trim().equalsIgnoreCase(LOGGING)) {
-                setOverrideGlobalLoggingLevel(msgTmp[1], sender, scope);
-            }
+            treatComplexCommand(sender, msgTmp[0].trim(),msgTmp[1].trim());
+        }
+    }
+
+    /**
+     * Response to following commands...
+     * <ul>
+     * <li>[help] - For display help message</li>
+     * <li>[list] - To display project list and project that requester currently following</li>
+     * <li>[logging] - To display current logging level</li>
+     * </ul>
+     * @param sender person who send the message
+     * @param command Krazip's command
+     * @param scope message scope
+     */
+    private void treatSimpleCommand(String sender, String command, String scope) {
+        if (command.equalsIgnoreCase(HELP)) {
+            sendBuildResult(null, null, scope); // Send help
+        } else if (command.equalsIgnoreCase(LIST)) {
+            listProject(sender);
+            listFollowingProject(sender);
+        } else if (command.equalsIgnoreCase(LOGGING)) {
+            getOverrideGlobalLoggingLevel(scope);
+        } else {
+            sendBuildResult(findNewestBuildByName(krazipBuildList, command), command, scope);
+        }
+    }
+
+    /**
+     * Response to following commands...
+     * <ul>
+     * <li>[follow {projectName}] - To follow a project</li>
+     * <li>[unfollow {projectName}] - To unfollow a project</li>
+     * <li>[logging {PASS}{FAIL}{OFF}] - To override global logging level</li>
+     * </ul>
+     * @param sender person who send the message
+     * @param command Krazip's command
+     * @param target command's argument
+     */
+    private void treatComplexCommand(String sender, String command, String target) {
+        if (command.equalsIgnoreCase(FOLLOW)) {
+            followProject(target, sender);
+        } else if (command.equalsIgnoreCase(UNFOLLOW)) {
+            unfollowProject(target, sender);
+        } else if (command.equalsIgnoreCase(LOGGING)) {
+            setOverrideGlobalLoggingLevel(target, sender, channel);
         }
     }
 
