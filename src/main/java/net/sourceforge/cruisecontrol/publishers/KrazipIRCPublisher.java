@@ -77,7 +77,7 @@ public class KrazipIRCPublisher implements Publisher {
      *
      * @return IRCConnection return an IRC connection that uses for sending messages to IRC server
      */
-    private IRCConnection ensureIrcConnection() {
+    protected IRCConnection ensureIrcConnection() {
         KrazipIRCConnection.establishInstance(host, port, nickName, userName, realName, channel, this);
         return KrazipIRCConnection.retrieveInstance();
     }

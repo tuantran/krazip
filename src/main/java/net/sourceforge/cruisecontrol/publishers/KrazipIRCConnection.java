@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * Thjs is a class that implementing Singleton pattern to ensure that Krazip only have one connection to IRC server.
  */
-public final class KrazipIRCConnection {
+public class KrazipIRCConnection {
 
     private static final Logger log = Logger.getLogger(KrazipIRCConnection.class);
     private static KrazipIRCConnection instance;

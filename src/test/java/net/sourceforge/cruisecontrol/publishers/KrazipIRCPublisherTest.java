@@ -2,10 +2,11 @@ package net.sourceforge.cruisecontrol.publishers;
 
 import junit.framework.Assert;
 import net.sourceforge.cruisecontrol.CruiseControlException;
+import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tests for KrazipIRCPublisher
@@ -14,8 +15,45 @@ import java.util.ArrayList;
  */
 
 public class KrazipIRCPublisherTest {
-
+    private static final Logger log = Logger.getLogger(KrazipIRCPublisherTest.class);
+    private static final String PASS = "pass";
+    private static final String FAIL = "fail";
+    private static final String FIXED = "fixed";
     private KrazipIRCPublisher publisher;
+
+
+    @Test
+    public void testPublishPassMessage() throws Exception {
+        List<String> messageLog;
+        Element cruiseControlBuildLog = new KrazipIRCPublisherTest().createcruiseControlBuildLog(PASS);
+        MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
+        mockPublisher.publish(cruiseControlBuildLog);
+        messageLog = mockPublisher.getMessageLog();
+        log.debug("\""+messageLog.get(0)+"\"");
+        Assert.assertEquals("PRIVMSG testChannel :\"someProjectname\" build completed successfully.",messageLog.get(0));
+    }
+
+    @Test
+    public void testPublishFailMessage() throws Exception {
+        List<String> messageLog;
+        Element cruiseControlBuildLog = new KrazipIRCPublisherTest().createcruiseControlBuildLog(FAIL);
+        MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
+        mockPublisher.publish(cruiseControlBuildLog);
+        messageLog = mockPublisher.getMessageLog();
+        log.debug("\""+messageLog.get(0)+"\"");
+        Assert.assertEquals("PRIVMSG testChannel :\"someProjectname\" build failed. Includes changes by someUser, someUser2.",messageLog.get(0));
+    }
+
+    @Test
+    public void testPublishFixedMessage() throws Exception {
+        List<String> messageLog;
+        Element cruiseControlBuildLog = new KrazipIRCPublisherTest().createcruiseControlBuildLog(FIXED);
+        MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
+        mockPublisher.publish(cruiseControlBuildLog);
+        messageLog = mockPublisher.getMessageLog();
+        log.debug("\""+messageLog.get(0)+"\"");
+        Assert.assertEquals("PRIVMSG testChannel :\"someProjectname\" build fixed. Includes changes by someUser, someUser2.",messageLog.get(0));
+    }
 
     @Test
     public void testBuildMessage() throws Exception {
@@ -24,7 +62,7 @@ public class KrazipIRCPublisherTest {
         publisher.setChannel("#someChannel");
         publisher.setResultURL("http://www.someurl.com/someProjectName");
         KrazipIRCPublisherTest publisherTest = new KrazipIRCPublisherTest();
-        Element cruiseControlBuildLog = publisherTest.createcruiseControlBuildLog(true);
+        Element cruiseControlBuildLog = publisherTest.createcruiseControlBuildLog(PASS);
         Assert.assertEquals
                 ("\"someProjectname\" build completed successfully." ,
                         publisher.buildMessage(cruiseControlBuildLog));
@@ -37,7 +75,7 @@ public class KrazipIRCPublisherTest {
         publisher.setChannel("#someChannel");
         publisher.setResultURL("http://www.someurl.com/someProjectName");
         KrazipIRCPublisherTest publisherTest = new KrazipIRCPublisherTest();
-        Element cruiseControlBuildLog = publisherTest.createcruiseControlBuildLog(false);
+        Element cruiseControlBuildLog = publisherTest.createcruiseControlBuildLog(FAIL);
         Assert.assertEquals
                 ("\"someProjectname\" build failed. Includes changes by someUser, " +
                         "someUser2. (" +
@@ -105,7 +143,7 @@ public class KrazipIRCPublisherTest {
         Assert.assertEquals("http://www.someurl.com/", publisher.getResultURL());
     }
 
-    protected Element createcruiseControlBuildLog(boolean buildPass){
+    protected Element createcruiseControlBuildLog(String status){
 
         // START: building modifications element
         Element modifications = new Element("modifications");
@@ -146,9 +184,14 @@ public class KrazipIRCPublisherTest {
         lastsuccessfulbuild.setAttribute("name", "lastsuccessfulbuild");
         lastsuccessfulbuild.setAttribute("value", "20101027155629");
 
+
         Element lastbuildsuccessful = new Element("property");
         lastbuildsuccessful.setAttribute("name", "lastbuildsuccessful");
-        lastbuildsuccessful.setAttribute("value", "true");
+        if(status.equalsIgnoreCase(FIXED)){
+            lastbuildsuccessful.setAttribute("value", "false");    
+        } else {
+            lastbuildsuccessful.setAttribute("value", "true");
+        }
 
         Element ccTimeStamp = new Element("property");
         ccTimeStamp.setAttribute("name", "cctimestamp");
@@ -163,7 +206,7 @@ public class KrazipIRCPublisherTest {
 
         // START: building build element
         Element buildElement = new Element("build");
-        if (!buildPass){
+        if (status.equalsIgnoreCase(FAIL)){
              buildElement.setAttribute("error","true");
         }
         // END: building build element
@@ -174,11 +217,6 @@ public class KrazipIRCPublisherTest {
         createcruiseControlBuildLog.addContent(buildElement);
 
         return createcruiseControlBuildLog;
-    }
-
-    @Test
-    public void findNewestBuildByNameWithEmptyList() {
-        new KrazipIRCPublisher().findNewestBuildByName(new ArrayList<KrazipBuildResult>(), "junit");
     }
 
 }
