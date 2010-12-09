@@ -91,6 +91,18 @@ public class KrazipIRCPublisherTest {
     }
 
     @Test
+    public void testBuildUrl() throws Exception {
+        List<String> messageLog;
+        Element cruiseControlBuildLog = new KrazipIRCPublisherTest().createcruiseControlBuildLog(FAIL);
+        MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
+        mockPublisher.setLoggingLevel(PASS);
+        mockPublisher.setResultURL("http://localhost:8080/cruisecontrol/buildresults/someProjectName");
+        mockPublisher.publish(cruiseControlBuildLog);
+        messageLog = mockPublisher.getMessageLog();
+        Assert.assertEquals("PRIVMSG testChannel :\"someProjectname\" build failed. Includes changes by someUser, someUser2. (http://localhost:8080/cruisecontrol/buildresults/someProjectName?log=log123456789)", messageLog.get(0));
+    }
+
+    @Test
     public void testResponsePrivateMsgHelp() throws Exception {
         List<String> messageLog;
         MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
@@ -229,6 +241,26 @@ public class KrazipIRCPublisherTest {
         publisher = new KrazipIRCPublisher();
         publisher.setResultURL("http://www.someurl.com/");
         Assert.assertEquals("http://www.someurl.com/", publisher.getResultURL());
+    }
+
+    @Test
+    public void testListener() throws Exception {
+        List<String> messageLog;
+        IRCUser user = new IRCUser("name","name","host");
+        MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
+        KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
+        listener.onDisconnected();
+        listener.onError("some error");
+        listener.onError(999, "some error");
+        listener.onInvite("#channel", user, "something");
+        listener.onJoin("test", user);
+        listener.onPing("ping");
+        listener.onQuit(user, "quit");
+        listener.onPart("#channel",user,"message");
+        listener.onReply(123, "value", "message");
+        listener.onRegistered();
+        listener.onNotice("#channel", user, "some string");
+        listener.onTopic("#channel", user, "some string");
     }
 
     protected Element createcruiseControlBuildLog(String status){
