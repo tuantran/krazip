@@ -20,7 +20,7 @@ public class MockIRCConnection extends IRCConnection {
 
     @Override
     public void send(String line) {
-        //log.debug("send: "+line);
+        log.debug("###IRC###: "+line);
         messageLog.add(line);
     }
 

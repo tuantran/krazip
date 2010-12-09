@@ -5,6 +5,7 @@ import net.sourceforge.cruisecontrol.CruiseControlException;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.junit.Test;
+import org.schwering.irc.lib.IRCUser;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class KrazipIRCPublisherTest {
     private static final String PASS = "pass";
     private static final String FAIL = "fail";
     private static final String FIXED = "fixed";
+    private static final String OFF = "off";
     private KrazipIRCPublisher publisher;
 
 
@@ -60,7 +62,7 @@ public class KrazipIRCPublisherTest {
         List<String> messageLog;
         Element cruiseControlBuildLog = new KrazipIRCPublisherTest().createcruiseControlBuildLog(PASS);
         MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
-        mockPublisher.setLoggingLevel("fail");
+        mockPublisher.setLoggingLevel(FAIL);
         mockPublisher.publish(cruiseControlBuildLog);
         messageLog = mockPublisher.getMessageLog();
         Assert.assertEquals(0, messageLog.size());
@@ -71,7 +73,7 @@ public class KrazipIRCPublisherTest {
         List<String> messageLog;
         Element cruiseControlBuildLog = new KrazipIRCPublisherTest().createcruiseControlBuildLog(FAIL);
         MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
-        mockPublisher.setLoggingLevel("fail");
+        mockPublisher.setLoggingLevel(FAIL);
         mockPublisher.publish(cruiseControlBuildLog);
         messageLog = mockPublisher.getMessageLog();
         Assert.assertEquals(1, messageLog.size());
@@ -80,12 +82,67 @@ public class KrazipIRCPublisherTest {
     @Test
     public void testLoggingLevelOff() throws Exception {
         List<String> messageLog;
-        Element cruiseControlBuildLog = new KrazipIRCPublisherTest().createcruiseControlBuildLog(PASS);
+        Element cruiseControlBuildLog = new KrazipIRCPublisherTest().createcruiseControlBuildLog(FAIL);
         MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
-        mockPublisher.setLoggingLevel("fail");
+        mockPublisher.setLoggingLevel(OFF);
         mockPublisher.publish(cruiseControlBuildLog);
         messageLog = mockPublisher.getMessageLog();
         Assert.assertEquals(0, messageLog.size());
+    }
+
+    @Test
+    public void testResponsePrivateMsgHelp() throws Exception {
+        List<String> messageLog;
+        MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
+        KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest help");
+        messageLog = mockPublisher.getMessageLog();
+        Assert.assertEquals("PRIVMSG testChannel :Usage : krazip [projectName] to display last build result for specified project, [follow {projectName}] to follow specified project, [unfollow {projectName}] to unfollow specified project, [list] to list currently following project, [help] to display this message, [logging] to display current logging level, [logging {PASS},{FAIL},{OFF}] to override global logging level", messageLog.get(0));
+    }
+
+    @Test
+    public void testResponsePrivateMsgList() throws Exception {
+        List<String> messageLog;
+        MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
+        KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest list");
+        messageLog = mockPublisher.getMessageLog();
+        Assert.assertEquals("PRIVMSG testNick :CruiseControl has not built any projects since started.", messageLog.get(0));
+        Assert.assertEquals("PRIVMSG testNick :You are not following any project", messageLog.get(1));
+    }
+
+    @Test
+    public void testResponsePrivateMsgLogging() throws Exception {
+        List<String> messageLog;
+        MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
+        KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest logging");
+        messageLog = mockPublisher.getMessageLog();
+        Assert.assertEquals("PRIVMSG testChannel :Global logging level is : \"PASS\"", messageLog.get(0));
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest logging off");
+        Assert.assertEquals(OFF, KrazipOverrideGlobalLogging.getOverrideValue());
+    }
+
+    @Test
+    public void testResponsePrivateMsgFollow() throws Exception {
+        List<String> messageLog;
+        MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
+        KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest follow krazip");
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest unfollow krazip");
+        messageLog = mockPublisher.getMessageLog();
+        Assert.assertEquals("PRIVMSG testNick :You are now following project \"krazip\"", messageLog.get(0));
+        Assert.assertEquals("PRIVMSG testNick :You have stopped following project \"krazip\"", messageLog.get(1));
+    }
+
+    @Test
+    public void testResponsePrivateMsgUnfollowNotExist() throws Exception {
+        List<String> messageLog;
+        MockKrazipIRCPublisher mockPublisher = new MockKrazipIRCPublisher();
+        KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
+        listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest unfollow krazip");
+        messageLog = mockPublisher.getMessageLog();
+        Assert.assertEquals("PRIVMSG testNick :You are currently not following project \"krazip\"", messageLog.get(0));
     }
 
     @Test
