@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<HTML style="zoom: 100%; ">
+<HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <TITLE>Introduce Krazip plug-in for CruiseControl</TITLE>
+    <META http-equiv="X-UA-Compatible" content="chrome=1">
+    <link rel="stylesheet" type="text/css" href="reset.css" />
+    <link rel="stylesheet" type="text/css" href="slide.css" />
+    
+</HEAD><BODY>
+<DIV class="presentation">
+    <DIV class="slides">
+        <DIV class="slide far-past">
+            <SECTION class="center intro">
+	        
+                <h1><img class="center_img" src="images/lg250.png"/></h1>
+                <p>Pongvech Vechprasit</p>
+                <p>pun@abctech-thailand.com</p>
+            </SECTION>
+        </DIV>
+
+        <DIV class="slide far-past">
+            <div class="logo"></div>            
+            <HEADER>
+            <!-- Header goes here -->
+                <h1>Agenda</h1>
+            <!-- End Header -->
+            </HEADER>
+            <SECTION>
+            <!-- Content goes here (li for each topic in list) -->
+                <UL class="summary">
+                    <li> Krazip Overview</li>
+                    <li> Krazip Installation/Configuration on CruiseControl</li>
+                    <li> Krazip Usage Demonstration</li>
+		    <li> Krazip Architecture/Design</li>
+                </UL>
+            <!-- End Content -->
+            </SECTION>
+            <FOOTER>
+                <p>
+                <!-- Footer goes here -->
+                    <span class="counter">2</span><!-- Page counter -->
+                    <span>Krazip </span><!-- Topic -->
+                    <span class="date">13/12/2010</span><!-- Date here -->
+                <!-- End Footer -->    
+                </p>
+            </FOOTER>
+        </DIV>
+
+        <DIV class="slide far-past">
+            <div class="logo"></div>
+            <HEADER>
+            <!-- Header goes here -->    
+                <h1>Krazip Overview</h1>
+            <!-- End Header -->    
+            </HEADER>
+            <SECTION>
+            <!-- Content goes here -->
+                <UL class="summary">
+                    <img class="center_img" src="images/KrazipOverview.png"/>
+		    <p><i><font size="2px"><center>IRC library : <a href="http://moepii.sourceforge.net/" target="_blank">http://moepii.sourceforge.net/</a></center></font></i></p>
+                </UL>
+            <!-- End Content -->    
+            </SECTION>
+            <FOOTER>
+                <p>
+                <!-- Footer goes here -->
+                    <span class="counter">3</span><!-- Page counter -->
+                    <span>Krazip</span><!-- Topic -->
+                    <span class="date">13/12/2010</span><!-- Date here -->
+                <!-- End Footer -->
+                </p>
+            </FOOTER>
+        </DIV>
+
+        <DIV class="slide far-past">
+            <div class="logo"></div>
+            <HEADER>
+            <!-- Header goes here -->
+                <h1>Krazip Installation</h1>
+            <!-- End Content -->
+            </HEADER>
+            <SECTION>
+            <!-- Content goes here -->
+		<ul class="summary">
+		<li><b>First, of course, you need a CruiseControl</b></li>
+		<ul><li>Get CruiseControl binary distribution version 2.8.4</li>
+		<li>Download and install it</li>
+		<li>Make sure everything is work, and then go to next step</li></ul>
+		</ul>
+            <!-- End Content -->    
+            </SECTION>
+            <FOOTER>
+                <p>
+                <!-- Footer goes here -->
+                    <span class="counter">4</span><!-- Page counter -->
+                    <span>Krazip</span><!-- Topic -->
+                    <span class="date">13/12/2010</span><!-- Date here -->
+                <!-- End Footer -->
+                </p>
+            </FOOTER>           
+        </DIV>
+                                                                        
+        <DIV class="slide far-past">
+            <div class="logo"></div>
+            <HEADER>
+            <!-- Header goes here -->
+                <h1>Krazip Installation (cont.)</h1>
+            <!-- End Content -->    
+            </HEADER>
+            <SECTION>
+            <!-- Content goes here -->
+<ul class="summary">
+<li><b>Install Krazip on CruiseControl is very simple...</b></li>
+<ul><li>You need Krazip library (krazip{version}.jar)</li>
+<li>Next you just go to where you installed CruiseControl and enter &quot;lib&quot; folder</li>
+<li>Add Krazip library to &quot;lib&quot; folder</li>
+<li>And you are done!(Now you need to configure it...</li></ul>
+</ul>
+            <!-- End Content -->    
+            </SECTION>
+            <FOOTER>
+                <p>
+                <!-- Footer goes here -->
+                    <span class="counter">5</span><!-- Page counter -->
+                    <span>Krazip</span><!-- Topic -->
+                    <span class="date">13/12/2010</span><!-- Date here -->
+                <!-- End Footer -->
+                </p>
+            </FOOTER>          
+        </DIV>
+</DIV> 
+
+<DIV class="slide far-past">
+            <div class="logo"></div>
+            <HEADER>
+            <!-- Header goes here -->
+                <h1>Krazip Configuration (config.xml)</h1>
+            <!-- End Content -->    
+            </HEADER>
+            <SECTION>
+            <!-- Content goes here -->
+		<ul class="summary">
+		<li><b>Register Krazip</b><font size="4px"> (right after &lt;cruisecontrol&gt;)</font></li>
+		<pre>&lt;plugin name=&quot;krazip&quot; classname=&quot;net.sourceforge.cruisecontrol.publishers.KrazipIRCPublisher&quot;/&gt;</pre></li>
+		</br><li><b>Config Krazip</b></li>
+		<pre>       &lt;publishers&gt;
+           &lt;krazip
+               host=&quot;irc.linpro.no&quot;
+               port=&quot;6667&quot;
+               channel=&quot;#krazip&quot;
+               resulturl=&quot;http://localhost:8080/cruisecontrol/buildresults/${project.name}&quot; /&gt;
+               logginglevel=&quot;pass&quot;
+               nickName=&quot;krazip&quot;
+        &lt;/publishers&gt;</pre>
+		</ul>
+		</br></br>
+		<font size="3px"><table width="100%" align="center" border="1"><tr><td align="left"><b>Attribute</b></td><td align="left"><b>Description</b></td><td align="left"><b>Note</b></td></tr><tr><td align="left">nickName</td><td align="left">Nick to use on the irc server</td><td align="left">*Optional* Defaults to &quot;krazip&quot;</td></tr><tr><td align="left">host</td><td align="left">URL for IRC server</td><td align="left">*Required*</td></tr><tr><td align="left">port</td><td align="left">IRC port</td><td align="left">*Optional* Default to 6667</td></tr><tr><td align="left">channel</td><td align="left">IRC channel for Krazip to publish</td><td align="left">*Required*</td></tr><tr><td align="left">resulturl</td><td align="left">An URL for log file</td><td align="left">*Optional* (Set this if you want to append a link to build log when build fail)</td></tr><tr><td align="left">logginglevel</td><td align="left">Logging level for Krazip</td><td align="left">*Optional* Can be &quot;Pass&quot;, &quot;Fail&quot; or &quot;off&quot;. Default is &quot;Pass&quot;</td></tr></table></font>
+            <!-- End Content -->    
+            </SECTION>
+            <FOOTER>
+                <p>
+                <!-- Footer goes here -->
+                    <span class="counter">6</span><!-- Page counter -->
+                    <span>Krazip</span><!-- Topic -->
+                    <span class="date">13/12/2010</span><!-- Date here -->
+                <!-- End Footer -->
+                </p>
+            </FOOTER>          
+        </DIV>
+</DIV> 
+
+<DIV class="slide far-past">
+            <div class="logo"></div>
+            <HEADER>
+            <!-- Header goes here -->
+                <h1>Krazip Configuration Example</h1>
+            <!-- End Content -->    
+            </HEADER>
+            <SECTION>
+            <!-- Content goes here -->
+		<pre>&lt;cruisecontrol&gt;
+ 
+   &lt;plugin name=&quot;krazip&quot; classname=&quot;net.sourceforge.cruisecontrol.publishers.KrazipIRCPublisher&quot;/&gt;
+ 
+    &lt;project name=&quot;connectfour&quot;&gt;
+        &lt;listeners&gt;
+            &lt;currentbuildstatuslistener file=&quot;logs/${project.name}/status.txt&quot;/&gt;
+        &lt;/listeners&gt;
+ 
+        &lt;modificationset quietperiod=&quot;15&quot;&gt;
+            &lt;!-- touch any file in connectfour project to trigger a build --&gt;
+            &lt;filesystem folder=&quot;projects/${project.name}&quot;/&gt;
+        &lt;/modificationset&gt;
+ 
+        &lt;schedule interval=&quot;30&quot;&gt;
+            &lt;ant anthome=&quot;apache-ant-1.7.0&quot; buildfile=&quot;projects/${project.name}/build.xml&quot;/&gt;
+        &lt;/schedule&gt;
+ 
+        &lt;log&gt;
+            &lt;merge dir=&quot;projects/${project.name}/target/test-results&quot;/&gt;
+        &lt;/log&gt;
+ 
+        &lt;publishers&gt;
+           &lt;krazip host=&quot;irc.linpro.no&quot;
+               port=&quot;6667&quot;
+               channel=&quot;#krazip&quot;
+               resulturl=&quot;http://localhost:8080/cruisecontrol/buildresults/${project.name}&quot; /&gt;
+            &lt;onsuccess&gt;
+                &lt;artifactspublisher dest=&quot;artifacts/${project.name}&quot; file=&quot;projects/${project.name}/target/${project.name}.jar&quot;/&gt;
+            &lt;/onsuccess&gt;
+        &lt;/publishers&gt;
+ 
+    &lt;/project&gt;
+&lt;/cruisecontrol&gt;</pre>
+            <!-- End Content -->    
+            </SECTION>
+            <FOOTER>
+                <p>
+                <!-- Footer goes here -->
+                    <span class="counter">7</span><!-- Page counter -->
+                    <span>Krazip</span><!-- Topic -->
+                    <span class="date">13/12/2010</span><!-- Date here -->
+                <!-- End Footer -->
+                </p>
+            </FOOTER>          
+        </DIV>
+</DIV> 
+
+        <DIV class="slide far-past">
+            <div class="logo"></div>
+            <HEADER>
+            <!-- Header goes here -->
+                <h1>Krazip Demonstration</h1>
+            <!-- End Content -->    
+            </HEADER>
+            <SECTION>
+            <!-- Content goes here -->
+<ul class="summary"></br>
+<li>Demo Krazip</li>
+
+<font size="4px"><table width="100%" align="center" border="1" class="bodyTable"><tr class="a"><td align="left"><b>Command</b></td><td align="left"><b>Description</b></td><td align="left"><b>Example</b></td></tr><tr class="b"><td align="left">help</td><td align="left">Display help message</td><td align="left"><i>krazip help</i></td></tr><tr class="a"><td align="left">list</td><td align="left">List project and following project</td><td align="left"><i>krazip list</i></td></tr><tr class="b"><td align="left">projectName</td><td align="left">Display latest build result</td><td align="left"><i>krazip someProjectName</i></td></tr><tr class="a"><td align="left">logging</td><td align="left">Display or Override current Krazip logging level</td><td align="left"><i>krazip logging</i> or <i>krazip logging {pass}{fail}{off}</i></td></tr><tr class="b"><td align="left">follow</td><td align="left">To follow a project</td><td align="left"><i>krazip follow someProjectName</i></td></tr><tr class="a"><td align="left">unfollow</td><td align="left">To stop following a project</td><td align="left"><i>krazip unfollow someProjectName</i></td></tr></table></font>
+
+</ul>
+            <!-- End Content -->    
+            </SECTION>
+            <FOOTER>
+                <p>
+                <!-- Footer goes here -->
+                    <span class="counter">8</span><!-- Page counter -->
+                    <span>Krazip</span><!-- Topic -->
+                    <span class="date">13/12/2010</span><!-- Date here -->
+                <!-- End Footer -->
+                </p>
+            </FOOTER>          
+        </DIV>
+</DIV> 
+
+<!-- presentation -->
+
+    
+    <SCRIPT>
+      var currentSlideNo;
+      var notesOn = false;
+      var slides = document.getElementsByClassName('slide');
+      
+
+      // var slide_hash = window.location.hash.replace(/#/, '');
+      // if (slide_hash) {
+      //   for (var i = 0, len = slides.length; i < len; i++) {
+      //     if (slides[i].id == slide_hash) {
+      //       currentSlideNo = i;
+      //       updateSlideClasses(); 
+      //     }
+      //   }
+      // }
+
+      function initialize() {
+        if (window.location.hash != "") {
+          currentSlideNo = Number(window.location.hash.replace('#slide', ''));
+        } else {
+          currentSlideNo = 1;
+        }
+
+        document.addEventListener('keydown', handleBodyKeyDown, false);
+
+        var els = slides;
+        for (var i = 0, el; el = els[i]; i++) {
+          el.className = 'slide far-future';
+        }
+        updateSlideClasses(); 
+      }
+      
+      function getSlideEl(slideNo) {
+        if (slideNo > 0) {
+          return slides[slideNo - 1];
+        } else {
+          return null;
+        }
+      }
+      
+      function getSlideTitle(slideNo) {
+        var el = getSlideEl(slideNo);
+        
+        if (el) {
+          return el.getElementsByTagName('header')[0].innerHTML;
+        } else {
+          return null;
+        }
+      }
+      
+      function changeSlideElClass(slideNo, className) {
+        var el = getSlideEl(slideNo);
+        
+        if (el) {
+          el.className = 'slide ' + className;
+        }
+      }
+      
+      function updateSlideClasses() {
+        window.location.hash = "slide" + currentSlideNo;
+        changeSlideElClass(currentSlideNo - 2, 'far-past');
+        changeSlideElClass(currentSlideNo - 1, 'past');
+        changeSlideElClass(currentSlideNo, 'current');
+        changeSlideElClass(currentSlideNo + 1, 'future');
+        changeSlideElClass(currentSlideNo + 2, 'far-future');                
+      }
+      
+      function nextSlide() {
+        if (currentSlideNo < slides.length) {
+          currentSlideNo++;
+        }
+        
+        updateSlideClasses();
+      }
+      
+      function prevSlide() {
+        if (currentSlideNo > 1) {
+          currentSlideNo--;
+        }
+        updateSlideClasses();
+      }
+      
+      function switch3D() {
+        if (document.body.className.indexOf('three-d') == -1) {
+          document.getElementsByClassName('presentation')[0].style.webkitPerspective = '1000px';
+
+          document.body.className += ' three-d';
+        } else {
+          window.setTimeout("document.getElementsByClassName('presentation')[0].style.webkitPerspective = '0';", 2000);
+          document.body.className = document.body.className.replace(/three-d/, '');
+        }
+      }
+      
+      function showNotes() {
+        var notes = document.querySelectorAll('.notes');
+        for (var i = 0, len = notes.length; i < len; i++) {
+          notes[i].style.display = (notesOn) ? 'none':'block';
+        }
+        notesOn = (notesOn) ? false:true;
+      }
+      
+      function handleBodyKeyDown(event) {
+        switch (event.keyCode) {
+          case 37: // left arrow
+            prevSlide();
+            break;
+          case 39: // right arrow
+          // case 32: // space
+            nextSlide();
+            break;
+          case 51: // 3
+            switch3D();          
+            break;
+          case 50: // 2
+            showNotes();          
+            break;
+        }
+      }
+      
+      initialize();
+    </SCRIPT>
+      
+    
+  
+
+</BODY></HTML>
