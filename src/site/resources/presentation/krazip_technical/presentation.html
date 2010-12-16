@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<HTML style="zoom: 100%; ">
+<HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <TITLE>Introduce Krazip plug-in for CruiseControl</TITLE>
+    <META http-equiv="X-UA-Compatible" content="chrome=1">
+    <link rel="stylesheet" type="text/css" href="reset.css" />
+    <link rel="stylesheet" type="text/css" href="slide.css" />
+    
+</HEAD><BODY>
+<DIV class="presentation">
+    <DIV class="slides">
+        <DIV class="slide far-past">
+            <SECTION class="center intro">
+	        
+                <h1><img class="center_img" src="images/lg250.png"/></h1>
+                <p>Pongvech Vechprasit</p>
+                <p>pun@abctech-thailand.com</p>
+            </SECTION>
+        </DIV>
+
+        <DIV class="slide far-past">
+            <div class="logo"></div>            
+            <HEADER>
+            <!-- Header goes here -->
+                <h1>Agenda</h1>
+            <!-- End Header -->
+            </HEADER>
+            <SECTION>
+            <!-- Content goes here (li for each topic in list) -->
+                <UL class="summary">
+                    <li> Krazip Technical Overview</li>
+                    <li> Krazip Work Flow</li>
+                </UL>
+            <!-- End Content -->
+            </SECTION>
+            <FOOTER>
+                <p>
+                <!-- Footer goes here -->
+                    <span class="counter">2</span><!-- Page counter -->
+                    <span>Krazip </span><!-- Topic -->
+                    <span class="date">13/12/2010</span><!-- Date here -->
+                <!-- End Footer -->    
+                </p>
+            </FOOTER>
+        </DIV>
+
+        <DIV class="slide far-past">
+            <div class="logo"></div>
+            <HEADER>
+            <!-- Header goes here -->    
+                <h1>Krazip Technical Overview</h1>
+            <!-- End Header -->    
+            </HEADER>
+            <SECTION>
+            <!-- Content goes here -->
+                <UL class="summary">
+                    <li>Krazip is not an official CruiseControl plug-in.</li>
+		    <li>Krazip is an publisher plug-in</li>
+		    <li><i>"Publishers are run after a build has completed. They will be run regardless of whether the build was successful or not." - <a href="http://cruisecontrol.sourceforge.net/main/configxml.html#publishers">CruiseControl</a></i></li>
+		    <li>Krazip is actually extracts information from CruiseControl build log, processes it and sends them to configured IRC settings.</li>
+                </UL>
+            <!-- End Content -->    
+            </SECTION>
+            <FOOTER>
+                <p>
+                <!-- Footer goes here -->
+                    <span class="counter">3</span><!-- Page counter -->
+                    <span>Krazip</span><!-- Topic -->
+                    <span class="date">13/12/2010</span><!-- Date here -->
+                <!-- End Footer -->
+                </p>
+            </FOOTER>
+        </DIV>
+
+        <DIV class="slide far-past">
+            <div class="logo"></div>
+            <HEADER>
+            <!-- Header goes here -->
+                <h1>Krazip Work Flow</h1>
+            <!-- End Content -->
+            </HEADER>
+            <SECTION>
+            <!-- Content goes here -->
+			<a href="./images/Krazip_flow.png" target="blank"><img class="center_img" src="images/Krazip_flow.png"/></a>
+            <!-- End Content -->    
+            </SECTION>
+            <FOOTER>
+                <p>
+                <!-- Footer goes here -->
+                    <span class="counter">4</span><!-- Page counter -->
+                    <span>Krazip</span><!-- Topic -->
+                    <span class="date">13/12/2010</span><!-- Date here -->
+                <!-- End Footer -->
+                </p>
+            </FOOTER>           
+        </DIV>        
+	
+	<DIV class="slide far-past">
+            <div class="logo"></div>
+            <HEADER>
+            <!-- Header goes here -->
+                <h1>Krazip IRC Interaction Flow</h1>
+            <!-- End Content -->
+            </HEADER>
+            <SECTION>
+            <!-- Content goes here -->
+			<a href="./images/Krazip_IRC_flow.png" target="blank"><img class="center_img" src="images/Krazip_IRC_flow.png"/></a>
+            <!-- End Content -->    
+            </SECTION>
+            <FOOTER>
+                <p>
+                <!-- Footer goes here -->
+                    <span class="counter">5</span><!-- Page counter -->
+                    <span>Krazip</span><!-- Topic -->
+                    <span class="date">13/12/2010</span><!-- Date here -->
+                <!-- End Footer -->
+                </p>
+            </FOOTER>           
+        </DIV>
+	
+	<DIV class="slide far-past">
+            <div class="logo"></div>
+            <HEADER>
+            <!-- Header goes here -->
+                <h1>Krazip in the future...</h1>
+            <!-- End Content -->
+            </HEADER>
+            <SECTION>
+            <!-- Content goes here -->
+                <UL class="summary">
+                    <li>User can initialise a CruiseControl build command from IRC.</li>
+		    <li>Eg. "krazip build transition"</li>
+            <!-- End Content -->    
+            </SECTION>
+            <FOOTER>
+                <p>
+                <!-- Footer goes here -->
+                    <span class="counter">5</span><!-- Page counter -->
+                    <span>Krazip</span><!-- Topic -->
+                    <span class="date">13/12/2010</span><!-- Date here -->
+                <!-- End Footer -->
+                </p>
+            </FOOTER>           
+        </DIV>
+                                                                        
+
+<!-- presentation -->
+
+    
+    <SCRIPT>
+      var currentSlideNo;
+      var notesOn = false;
+      var slides = document.getElementsByClassName('slide');
+      
+
+      // var slide_hash = window.location.hash.replace(/#/, '');
+      // if (slide_hash) {
+      //   for (var i = 0, len = slides.length; i < len; i++) {
+      //     if (slides[i].id == slide_hash) {
+      //       currentSlideNo = i;
+      //       updateSlideClasses(); 
+      //     }
+      //   }
+      // }
+
+      function initialize() {
+        if (window.location.hash != "") {
+          currentSlideNo = Number(window.location.hash.replace('#slide', ''));
+        } else {
+          currentSlideNo = 1;
+        }
+
+        document.addEventListener('keydown', handleBodyKeyDown, false);
+
+        var els = slides;
+        for (var i = 0, el; el = els[i]; i++) {
+          el.className = 'slide far-future';
+        }
+        updateSlideClasses(); 
+      }
+      
+      function getSlideEl(slideNo) {
+        if (slideNo > 0) {
+          return slides[slideNo - 1];
+        } else {
+          return null;
+        }
+      }
+      
+      function getSlideTitle(slideNo) {
+        var el = getSlideEl(slideNo);
+        
+        if (el) {
+          return el.getElementsByTagName('header')[0].innerHTML;
+        } else {
+          return null;
+        }
+      }
+      
+      function changeSlideElClass(slideNo, className) {
+        var el = getSlideEl(slideNo);
+        
+        if (el) {
+          el.className = 'slide ' + className;
+        }
+      }
+      
+      function updateSlideClasses() {
+        window.location.hash = "slide" + currentSlideNo;
+        changeSlideElClass(currentSlideNo - 2, 'far-past');
+        changeSlideElClass(currentSlideNo - 1, 'past');
+        changeSlideElClass(currentSlideNo, 'current');
+        changeSlideElClass(currentSlideNo + 1, 'future');
+        changeSlideElClass(currentSlideNo + 2, 'far-future');                
+      }
+      
+      function nextSlide() {
+        if (currentSlideNo < slides.length) {
+          currentSlideNo++;
+        }
+        
+        updateSlideClasses();
+      }
+      
+      function prevSlide() {
+        if (currentSlideNo > 1) {
+          currentSlideNo--;
+        }
+        updateSlideClasses();
+      }
+      
+      function switch3D() {
+        if (document.body.className.indexOf('three-d') == -1) {
+          document.getElementsByClassName('presentation')[0].style.webkitPerspective = '1000px';
+
+          document.body.className += ' three-d';
+        } else {
+          window.setTimeout("document.getElementsByClassName('presentation')[0].style.webkitPerspective = '0';", 2000);
+          document.body.className = document.body.className.replace(/three-d/, '');
+        }
+      }
+      
+      function showNotes() {
+        var notes = document.querySelectorAll('.notes');
+        for (var i = 0, len = notes.length; i < len; i++) {
+          notes[i].style.display = (notesOn) ? 'none':'block';
+        }
+        notesOn = (notesOn) ? false:true;
+      }
+      
+      function handleBodyKeyDown(event) {
+        switch (event.keyCode) {
+          case 37: // left arrow
+            prevSlide();
+            break;
+          case 39: // right arrow
+          // case 32: // space
+            nextSlide();
+            break;
+          case 51: // 3
+            switch3D();          
+            break;
+          case 50: // 2
+            showNotes();          
+            break;
+        }
+      }
+      
+      initialize();
+    </SCRIPT>
+      
+    
+  
+
+</BODY></HTML>
