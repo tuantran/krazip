@@ -19,9 +19,9 @@ Krazip Overview
  Krazip was developed on CruiseControl version 2.8.4 and use external irclib.jar for IRC communication library.
  You can find more information and download the library file from {{http://moepii.sourceforge.net/}}
 
- Please click {{{./presentation/krazip/presentation.html}here}} to view Krazip presentation in HTML5.
+ Please click {{{./presentation/krazip/presentation.html}here}} to view Krazip presentation in HTML5 slide.
 
- Please click {{{./presentation/krazip_technical/presentation.html}here}} to view Krazip(Technical) presentation in HTML5.
+ Please click {{{./presentation/krazip_technical/presentation.html}here}} to view Krazip(Technical) presentation in HTML5 slide.
 
 [images/KrazipOverview.png]
 
