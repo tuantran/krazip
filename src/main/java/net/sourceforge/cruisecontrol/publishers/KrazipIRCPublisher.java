@@ -12,8 +12,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -41,6 +44,8 @@ public class KrazipIRCPublisher implements Publisher {
     private static final String LOGGING = "logging";
     private static final String UNFOLLOW = "unfollow";
     private static final String FOLLOW = "follow";
+    private static final String DATE = "date";
+    private static final String TIME = "time";
     private static final String QUOTATION = "\"";
     private static final String KRAZIP_PROPERTY_FILE = "krazip.properties";
     private static final int ONE_ARGUMENT_PASSED = 1;
@@ -49,6 +54,7 @@ public class KrazipIRCPublisher implements Publisher {
     private static final int DEFAULT_IRC_PORT = 6667;
     private static List<KrazipBuildResult> krazipBuildList = new ArrayList<KrazipBuildResult>();
     private static List<KrazipFollowProject> krazipFollowList = new ArrayList<KrazipFollowProject>();
+
     private int port = DEFAULT_IRC_PORT;
     private String host;
     private String nickName = "Krazip";
@@ -209,7 +215,7 @@ public class KrazipIRCPublisher implements Publisher {
      * @param sender person who send the message
      * @param msg    the message body
      */
-    public void responsePrivateMessage(String sender, String msg) {
+    protected void responsePrivateMessage(String sender, String msg) {
         String[] msgTmp = msg.split("\\s+");
         String scope = channel;
         String krazipNickname = this.getNickName().trim();
@@ -230,7 +236,7 @@ public class KrazipIRCPublisher implements Publisher {
      * @param sender person who send the message
      * @param msg    the message body
      */
-    public void responsePrivatePrivateMessage(String sender, String msg) {
+    protected void responsePrivatePrivateMessage(String sender, String msg) {
         String[] msgTmp = msg.split("\\s+");
         if (msgTmp.length == ONE_ARGUMENT_PASSED) {
             treatSimpleCommand(sender, msgTmp[0].trim(), sender);
@@ -250,7 +256,7 @@ public class KrazipIRCPublisher implements Publisher {
      * @param command Krazip's command
      * @param scope message scope
      */
-    private void treatSimpleCommand(String sender, String command, String scope) {
+    protected void treatSimpleCommand(String sender, String command, String scope) {
         if (command.equalsIgnoreCase(HELP)) {
             sendBuildResult(null, null, scope); // Send help
         } else if (command.equalsIgnoreCase(LIST)) {
@@ -258,6 +264,8 @@ public class KrazipIRCPublisher implements Publisher {
             listFollowingProject(sender);
         } else if (command.equalsIgnoreCase(LOGGING)) {
             getOverrideGlobalLoggingLevel(scope);
+        } else if (command.equalsIgnoreCase(DATE) || command.equalsIgnoreCase(TIME)) {
+            tellDateTime(scope);
         } else {
             sendBuildResult(findNewestBuildByName(krazipBuildList, command), command, scope);
         }
@@ -274,7 +282,7 @@ public class KrazipIRCPublisher implements Publisher {
      * @param command Krazip's command
      * @param target command's argument
      */
-    private void treatComplexCommand(String sender, String command, String target) {
+    protected void treatComplexCommand(String sender, String command, String target) {
         if (command.equalsIgnoreCase(FOLLOW)) {
             followProject(target, sender);
         } else if (command.equalsIgnoreCase(UNFOLLOW)) {
@@ -290,7 +298,7 @@ public class KrazipIRCPublisher implements Publisher {
      * @param requestedProjectName a project name that user wishes to follow
      * @param sender               a user that requested to follow
      */
-    public void followProject(String requestedProjectName, String sender) {
+    protected void followProject(String requestedProjectName, String sender) {
         boolean alreadyFollow = false;
         for (KrazipFollowProject aKrazipFollowList : krazipFollowList) {
             String projectNameTmp = aKrazipFollowList.getProjectName();
@@ -318,7 +326,7 @@ public class KrazipIRCPublisher implements Publisher {
      * @param requestedProjectName a project name that user wishes to unfollow
      * @param sender               a user that requested to unfollow
      */
-    public void unfollowProject(String requestedProjectName, String sender) {
+    protected void unfollowProject(String requestedProjectName, String sender) {
         boolean found = false;
         for (int i = 0; i < krazipFollowList.size(); i++) {
             String projectName = krazipFollowList.get(i).getProjectName();
@@ -346,7 +354,7 @@ public class KrazipIRCPublisher implements Publisher {
      *
      * @param sender a user who requested the list
      */
-    public void listFollowingProject(String sender) {
+    protected void listFollowingProject(String sender) {
         boolean found = false;
         StringBuilder msg = new StringBuilder();
         msg.append("You are following : ");
@@ -377,7 +385,7 @@ public class KrazipIRCPublisher implements Publisher {
      *
      * @param sender a user who requested the list
      */
-    public void listProject(String sender) {
+    protected void listProject(String sender) {
         boolean found = false;
         StringBuilder msg = new StringBuilder();
         msg.append("Project list : ");
@@ -411,7 +419,7 @@ public class KrazipIRCPublisher implements Publisher {
      * @param projectName name of the project
      * @param msg         build message
      */
-    public void sendMessageToFollower(String projectName, String msg) {
+    protected void sendMessageToFollower(String projectName, String msg) {
         for (KrazipFollowProject aKrazipFollowList : krazipFollowList) {
             String followedProject = aKrazipFollowList.getProjectName();
             if (followedProject.equalsIgnoreCase(projectName)) {
@@ -428,7 +436,7 @@ public class KrazipIRCPublisher implements Publisher {
      * @param requestedProjectName project name that was requested to see the last build result
      * @param scope                message scope to be sent to IRC
      */
-    public void sendBuildResult(KrazipBuildResult krazipBuildResult, String requestedProjectName, String scope) {
+    protected void sendBuildResult(KrazipBuildResult krazipBuildResult, String requestedProjectName, String scope) {
         if (krazipBuildResult == null && requestedProjectName == null) {
             String helpMessage = "Usage : krazip [projectName] to display last build result for specified project, " +
                     "[follow {projectName}] to follow specified project, [unfollow {projectName}] to unfollow " +
@@ -456,7 +464,7 @@ public class KrazipIRCPublisher implements Publisher {
      * @param sender  user that issued the command
      * @param scope   message scope to be sent to IRC
      */
-    public void setOverrideGlobalLoggingLevel(String setting, String sender, String scope) {
+    protected void setOverrideGlobalLoggingLevel(String setting, String sender, String scope) {
 
         if (setting.trim().equalsIgnoreCase(PASS) || setting.trim().equalsIgnoreCase(FAIL) ||
                 setting.trim().equalsIgnoreCase(OFF)) {
@@ -484,7 +492,7 @@ public class KrazipIRCPublisher implements Publisher {
      *
      * @param scope the scope for sending the message back. (Back to sender only or send back to channel)
      */
-    public void getOverrideGlobalLoggingLevel(String scope) {
+    protected void getOverrideGlobalLoggingLevel(String scope) {
         if (!KrazipOverrideGlobalLogging.getOverrideValue().equalsIgnoreCase("nothing")) {
             ensureIrcConnection().doPrivmsg(scope, "Global logging level has been overridden to :" +
                     " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + "\"");
@@ -547,6 +555,13 @@ public class KrazipIRCPublisher implements Publisher {
             }
         }
         return mappingName;
+    }
+
+    protected void tellDateTime(String scope){
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = new Date();
+        String dateStr =  dateFormat.format(date);
+        ensureIrcConnection().doPrivmsg(scope, "Current date and time is " + dateStr + ".");
     }
 
     /**
