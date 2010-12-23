@@ -11,6 +11,8 @@
 Krazip Overview
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+ Krazip were developed by APDM Team at ABC Tech Ltd. (Thailand). {{http://www.abctech-thailand.com}}
+
  Krazip is a CruiseControl plug-in for sending live build result to IRC channel.
  It also has functionality for interaction with user in IRC via commands. For instance, you can override the logging
  level by type "krazip logging {new logging level}. Krazip will override the logging level found in config.xml file.
