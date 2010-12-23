@@ -110,7 +110,7 @@ Krazip Configuration (config.xml)
 +---
        <publishers>
 	   <krazip
-	       host="irc.linpro.no"
+	       host="irchost"
 	       port="6667"
 	       channel="#krazip"
 	       resulturl="http://localhost:8080/cruisecontrol/buildresults/${project.name}" />
@@ -171,7 +171,7 @@ Krazip Configuration (config.xml)
         </log>
 
         <publishers>
-	   <krazip host="irc.linpro.no"
+	   <krazip host="somehost"
 	       port="6667"
 	       channel="#krazip"
 	       resulturl="http://localhost:8080/cruisecontrol/buildresults/${project.name}" />
@@ -189,7 +189,7 @@ Optional : Configure Krazip to report build participant with IRC nickname
  Normally when build failed, Krazip will report build result to IRC channel with message like below. You may don't want to do this if you already happy with the default behavior.
 
 +---
-  "krazip" build failed. Includes changes by pun@abctech-thailand.com. ((http://apdm.dev.abctech-thailand.com/cruisecontrol/buildresults/krazip?log=log20101117154430))
+  "krazip" build failed. Includes changes by pun@abctech-thailand.com. ((http://abctech-thailand.com/cruisecontrol/buildresults/krazip?log=log20101117154430))
 +---
 
  By default, Krazip will retrieves build participant email from modification element in CruiseControl log. (Email or user if email is not found) Please see below...
@@ -226,7 +226,7 @@ krazip.properties in CruiseControl root folder.>> Then add the mapping values li
  From the example build message above, it will be turned into something like...
 
 +---
-  "krazip" build failed. Includes changes by pun. ((http://apdm.dev.abctech-thailand.com/cruisecontrol/buildresults/krazip?log=log20101117154430))
+  "krazip" build failed. Includes changes by pun. ((http://dev.abctech-thailand.com/cruisecontrol/buildresults/krazip?log=log20101117154430))
 +---
 
 Troubleshooting : Krazip build fail because cruisecontrol.jar is missing
@@ -242,5 +242,5 @@ Troubleshooting : Krazip build fail because cruisecontrol.jar is missing
  mvn install:install-file -Dfile=cruisecontrol.jar -DgroupId=net.sourceforge.cruisecontrol -DartifactId=cruisecontrol -Dversion=2.8.4 -Dpackaging=jar
 +---
  
- * Done. You can build the project. :) 
+ * Done. Happy coding!! :)
 
