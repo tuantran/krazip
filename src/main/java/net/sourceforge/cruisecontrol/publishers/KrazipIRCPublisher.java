@@ -235,7 +235,6 @@ public class KrazipIRCPublisher implements Publisher {
      */
     protected void responsePrivateMessage(String sender, String msg) {
         String[] msgTmp = msg.split("\\s+");
-        String scope = channel;
         String krazipNickname = this.getNickName().trim();
         msgTmp[0] = msgTmp[0].replace(',', ' ').trim();
         msgTmp[0] = msgTmp[0].replace(':', ' ').trim();
