@@ -104,11 +104,11 @@ public class KrazipIRCPublisher implements Publisher {
                 }
                 if (loggingLevel.trim().equalsIgnoreCase(PASS)) {
                     log.info("Logging level: \"pass\" sending build result to IRC server...");
-                    ensureIrcConnection().doPrivmsg(channel, message);
+                    ensureIrcConnection().doNotice(channel, message);
                 } else if (loggingLevel.trim().equalsIgnoreCase(FAIL)) {
                     log.info("Logging level: \"fail\" sending only fail and fixed result to IRC server...");
                     if (buildResult.equals(FIXED) || buildResult.equals(FAIL)) {
-                        ensureIrcConnection().doPrivmsg(channel, message);
+                        ensureIrcConnection().doNotice(channel, message);
                     }
                 } else {
                     log.info("Logging level: \"off\" not sending any build result to IRC server...");
@@ -223,7 +223,7 @@ public class KrazipIRCPublisher implements Publisher {
         msgTmp[0] = msgTmp[0].replace(':', ' ').trim();
         if (msgTmp[0].equalsIgnoreCase(krazipNickname)) {
             if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
-                treatSimpleCommand(sender, msgTmp[1].trim(), scope);
+                treatSimpleCommand(sender, msgTmp[1].trim());
             } else if (msgTmp.length == THREE_ARGUMENTS_PASSED) {
                 treatComplexCommand(sender, msgTmp[1].trim(),msgTmp[2].trim());
             }
@@ -239,7 +239,7 @@ public class KrazipIRCPublisher implements Publisher {
     protected void responsePrivatePrivateMessage(String sender, String msg) {
         String[] msgTmp = msg.split("\\s+");
         if (msgTmp.length == ONE_ARGUMENT_PASSED) {
-            treatSimpleCommand(sender, msgTmp[0].trim(), sender);
+            treatSimpleCommand(sender, msgTmp[0].trim());
         } else if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
             treatComplexCommand(sender, msgTmp[0].trim(),msgTmp[1].trim());
         }
@@ -254,20 +254,19 @@ public class KrazipIRCPublisher implements Publisher {
      * </ul>
      * @param sender person who send the message
      * @param command Krazip's command
-     * @param scope message scope
      */
-    protected void treatSimpleCommand(String sender, String command, String scope) {
+    protected void treatSimpleCommand(String sender, String command) {
         if (command.equalsIgnoreCase(HELP)) {
-            sendBuildResult(null, null, scope); // Send help
+            sendBuildResult(null, null, sender); // Send help
         } else if (command.equalsIgnoreCase(LIST)) {
             listProject(sender);
             listFollowingProject(sender);
         } else if (command.equalsIgnoreCase(LOGGING)) {
-            getOverrideGlobalLoggingLevel(scope);
+            getOverrideGlobalLoggingLevel();
         } else if (command.equalsIgnoreCase(DATE) || command.equalsIgnoreCase(TIME)) {
-            tellDateTime(scope);
+            tellDateTime();
         } else {
-            sendBuildResult(findNewestBuildByName(krazipBuildList, command), command, scope);
+            sendBuildResult(findNewestBuildByName(krazipBuildList, command), command, sender);
         }
     }
 
@@ -305,7 +304,7 @@ public class KrazipIRCPublisher implements Publisher {
             String followerTmp = aKrazipFollowList.getFollower();
             if (projectNameTmp.equalsIgnoreCase(requestedProjectName.trim()) &&
                     followerTmp.equalsIgnoreCase(sender.trim())) {
-                ensureIrcConnection().doPrivmsg(sender, "You are already following project \"" +
+                ensureIrcConnection().doNotice(sender, "You are already following project \"" +
                         projectNameTmp + "\"");
                 log.info(sender + " is already following " + projectNameTmp);
                 alreadyFollow = true;
@@ -313,7 +312,7 @@ public class KrazipIRCPublisher implements Publisher {
         }
         if (!alreadyFollow) {
             krazipFollowList.add(new KrazipFollowProject(requestedProjectName, sender));
-            ensureIrcConnection().doPrivmsg(sender, "You are now following project \"" + requestedProjectName + "\"");
+            ensureIrcConnection().doNotice(sender, "You are now following project \"" + requestedProjectName + "\"");
             log.info("krazipFollowList = " + requestedProjectName + " : " + sender + " (ADDED) size=" +
                     krazipFollowList.size());
             log.info(sender + " is now following " + requestedProjectName);
@@ -334,7 +333,7 @@ public class KrazipIRCPublisher implements Publisher {
             log.info("krazipFollowList = " + projectName + " : " + follower);
             if (projectName.equalsIgnoreCase(requestedProjectName.trim()) && follower.equalsIgnoreCase(sender.trim())) {
                 krazipFollowList.remove(i);
-                ensureIrcConnection().doPrivmsg(sender, "You have stopped following project \"" + projectName + "\"");
+                ensureIrcConnection().doNotice(sender, "You have stopped following project \"" + projectName + "\"");
                 log.info("krazipFollowList = " + projectName + " : " + follower + " (DELETED) size=" +
                         krazipFollowList.size());
                 log.info(sender + " has stopped following " + projectName);
@@ -343,7 +342,7 @@ public class KrazipIRCPublisher implements Publisher {
             }
         }
         if (!found) {
-            ensureIrcConnection().doPrivmsg(sender, "You are currently not following project \"" +
+            ensureIrcConnection().doNotice(sender, "You are currently not following project \"" +
                     requestedProjectName + "\"");
             log.info(sender + " is not currently following " + requestedProjectName);
         }
@@ -372,10 +371,10 @@ public class KrazipIRCPublisher implements Publisher {
             }
         }
         if (found) {
-            ensureIrcConnection().doPrivmsg(sender, msg.toString());
+            ensureIrcConnection().doNotice(sender, msg.toString());
             log.info(msg.toString());
         } else {
-            ensureIrcConnection().doPrivmsg(sender, "You are not following any project");
+            ensureIrcConnection().doNotice(sender, "You are not following any project");
             log.info(sender + " is not following any project");
         }
     }
@@ -405,10 +404,10 @@ public class KrazipIRCPublisher implements Publisher {
             }
         }
         if (found) {
-            ensureIrcConnection().doPrivmsg(sender, msg.toString());
+            ensureIrcConnection().doNotice(sender, msg.toString());
             log.info(msg.toString());
         } else {
-            ensureIrcConnection().doPrivmsg(sender, "CruiseControl has not built any projects since started.");
+            ensureIrcConnection().doNotice(sender, "CruiseControl has not built any projects since started.");
             log.info("Can't list project : CruiseControl has not built any projects since started");
         }
     }
@@ -424,7 +423,7 @@ public class KrazipIRCPublisher implements Publisher {
             String followedProject = aKrazipFollowList.getProjectName();
             if (followedProject.equalsIgnoreCase(projectName)) {
                 String follower = aKrazipFollowList.getFollower();
-                ensureIrcConnection().doPrivmsg(follower, msg);
+                ensureIrcConnection().doNotice(follower, msg);
             }
         }
     }
@@ -443,14 +442,14 @@ public class KrazipIRCPublisher implements Publisher {
                     "specified project, [list] to list currently following project, [help] to display this message" +
                     ", [logging] to display current logging level, [logging {PASS},{FAIL},{OFF}] to override global" +
                     " logging level";
-            ensureIrcConnection().doPrivmsg(scope, helpMessage);
+            ensureIrcConnection().doNotice(scope, helpMessage);
         } else {
             if (krazipBuildResult != null && krazipBuildResult.getMessage() != null) {
                 // Send response message to IRC
-                ensureIrcConnection().doPrivmsg(scope, krazipBuildResult.getMessage());
+                ensureIrcConnection().doNotice(scope, krazipBuildResult.getMessage());
             } else {
                 // Requested projectName not found in ArrayList
-                ensureIrcConnection().doPrivmsg(scope, "Project name \"" + requestedProjectName +
+                ensureIrcConnection().doNotice(scope, "Project name \"" + requestedProjectName +
                         "\" not found or it haven't been built" +
                         " since CruiseControl started (type \"krazip help\" for help)");
             }
@@ -469,19 +468,19 @@ public class KrazipIRCPublisher implements Publisher {
         if (setting.trim().equalsIgnoreCase(PASS) || setting.trim().equalsIgnoreCase(FAIL) ||
                 setting.trim().equalsIgnoreCase(OFF)) {
             if (KrazipOverrideGlobalLogging.getOverrideValue().equalsIgnoreCase(setting)) {
-                ensureIrcConnection().doPrivmsg(scope, "Current global logging level is already at " +
+                ensureIrcConnection().doNotice(scope, "Current global logging level is already at " +
                         QUOTATION + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + QUOTATION +
                         ". Keeping the current setting.");
             } else {
                 KrazipOverrideGlobalLogging.setOverrideValue(setting);
-                ensureIrcConnection().doPrivmsg(scope, "Global logging level has been overridden to : " +
+                ensureIrcConnection().doNotice(scope, "Global logging level has been overridden to : " +
                         QUOTATION + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + QUOTATION + " by " + sender);
                 log.info(sender + " has overridden global logging level to : " +
                         QUOTATION + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + QUOTATION);
             }
 
         } else {
-            ensureIrcConnection().doPrivmsg(sender, "Incorrect logging level : {" + PASS.toUpperCase() +
+            ensureIrcConnection().doNotice(sender, "Incorrect logging level : {" + PASS.toUpperCase() +
                     "} {" + FAIL.toUpperCase() + "} {" + OFF.toUpperCase() + "}");
             log.info(sender + " has put incorrect global logging level :" + setting + " (IGNORED)");
         }
@@ -489,15 +488,13 @@ public class KrazipIRCPublisher implements Publisher {
 
     /**
      * Return current logging level to sender in IRC
-     *
-     * @param scope the scope for sending the message back. (Back to sender only or send back to channel)
      */
-    protected void getOverrideGlobalLoggingLevel(String scope) {
+    protected void getOverrideGlobalLoggingLevel() {
         if (!KrazipOverrideGlobalLogging.getOverrideValue().equalsIgnoreCase("nothing")) {
-            ensureIrcConnection().doPrivmsg(scope, "Global logging level has been overridden to :" +
+            ensureIrcConnection().doNotice(channel, "Global logging level has been overridden to :" +
                     " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + "\"");
         } else {
-            ensureIrcConnection().doPrivmsg(scope, "Global logging level is : \"" + loggingLevel.toUpperCase() + "\"");
+            ensureIrcConnection().doNotice(channel, "Global logging level is : \"" + loggingLevel.toUpperCase() + "\"");
         }
     }
 
@@ -557,11 +554,11 @@ public class KrazipIRCPublisher implements Publisher {
         return mappingName;
     }
 
-    protected void tellDateTime(String scope){
+    protected void tellDateTime(){
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
         String dateStr =  dateFormat.format(date);
-        ensureIrcConnection().doPrivmsg(scope, "Current date and time is " + dateStr + ".");
+        ensureIrcConnection().doNotice(channel, "Current date and time is " + dateStr + ".");
     }
 
     /**

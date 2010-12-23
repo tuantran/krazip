@@ -32,7 +32,7 @@ public class KrazipIRCPublisherTest {
         mockPublisher.publish(cruiseControlBuildLog);
         messageLog = mockPublisher.getMessageLog();
         log.debug("\""+messageLog.get(0)+"\"");
-        Assert.assertEquals("PRIVMSG testChannel :\"someProjectname\" build completed successfully.",messageLog.get(0));
+        Assert.assertEquals("NOTICE testChannel :\"someProjectname\" build completed successfully.",messageLog.get(0));
     }
 
     @Test
@@ -43,7 +43,7 @@ public class KrazipIRCPublisherTest {
         mockPublisher.publish(cruiseControlBuildLog);
         messageLog = mockPublisher.getMessageLog();
         log.debug("\""+messageLog.get(0)+"\"");
-        Assert.assertEquals("PRIVMSG testChannel :\"someProjectname\" build failed. Includes changes by someUser, someUser2.",messageLog.get(0));
+        Assert.assertEquals("NOTICE testChannel :\"someProjectname\" build failed. Includes changes by someUser, someUser2.",messageLog.get(0));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class KrazipIRCPublisherTest {
         mockPublisher.publish(cruiseControlBuildLog);
         messageLog = mockPublisher.getMessageLog();
         log.debug("\""+messageLog.get(0)+"\"");
-        Assert.assertEquals("PRIVMSG testChannel :\"someProjectname\" build fixed. Includes changes by someUser, someUser2.",messageLog.get(0));
+        Assert.assertEquals("NOTICE testChannel :\"someProjectname\" build fixed. Includes changes by someUser, someUser2.",messageLog.get(0));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class KrazipIRCPublisherTest {
         mockPublisher.setResultURL("http://localhost:8080/cruisecontrol/buildresults/someProjectName");
         mockPublisher.publish(cruiseControlBuildLog);
         messageLog = mockPublisher.getMessageLog();
-        Assert.assertEquals("PRIVMSG testChannel :\"someProjectname\" build failed. Includes changes by someUser, someUser2. (http://localhost:8080/cruisecontrol/buildresults/someProjectName?log=log123456789)", messageLog.get(0));
+        Assert.assertEquals("NOTICE testChannel :\"someProjectname\" build failed. Includes changes by someUser, someUser2. (http://localhost:8080/cruisecontrol/buildresults/someProjectName?log=log123456789)", messageLog.get(0));
     }
 
     @Test
@@ -109,7 +109,7 @@ public class KrazipIRCPublisherTest {
         KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest help");
         messageLog = mockPublisher.getMessageLog();
-        Assert.assertEquals("PRIVMSG testChannel :Usage : krazip [projectName] to display last build result for specified project, [follow {projectName}] to follow specified project, [unfollow {projectName}] to unfollow specified project, [list] to list currently following project, [help] to display this message, [logging] to display current logging level, [logging {PASS},{FAIL},{OFF}] to override global logging level", messageLog.get(0));
+        Assert.assertEquals("NOTICE testNick :Usage : krazip [projectName] to display last build result for specified project, [follow {projectName}] to follow specified project, [unfollow {projectName}] to unfollow specified project, [list] to list currently following project, [help] to display this message, [logging] to display current logging level, [logging {PASS},{FAIL},{OFF}] to override global logging level", messageLog.get(0));
     }
 
     @Test
@@ -119,8 +119,8 @@ public class KrazipIRCPublisherTest {
         KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest list");
         messageLog = mockPublisher.getMessageLog();
-        Assert.assertEquals("PRIVMSG testNick :Project list : \"someProjectname\".", messageLog.get(0));
-        Assert.assertEquals("PRIVMSG testNick :You are not following any project", messageLog.get(1));
+        Assert.assertEquals("NOTICE testNick :Project list : \"someProjectname\".", messageLog.get(0));
+        Assert.assertEquals("NOTICE testNick :You are not following any project", messageLog.get(1));
     }
 
     @Test
@@ -131,12 +131,12 @@ public class KrazipIRCPublisherTest {
         KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest logging");
         messageLog = mockPublisher.getMessageLog();
-        Assert.assertEquals("PRIVMSG testChannel :Global logging level is : \"PASS\"", messageLog.get(0));
+        Assert.assertEquals("NOTICE testChannel :Global logging level is : \"PASS\"", messageLog.get(0));
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest logging off");
-        Assert.assertEquals("PRIVMSG testChannel :Global logging level has been overridden to : \"OFF\" by testNick", messageLog.get(1));
+        Assert.assertEquals("NOTICE testChannel :Global logging level has been overridden to : \"OFF\" by testNick", messageLog.get(1));
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest logging pass");
         mockPublisher.publish(cruiseControlBuildLog);
-        Assert.assertEquals("PRIVMSG testChannel :\"someProjectname\" build completed successfully.", messageLog.get(3));
+        Assert.assertEquals("NOTICE testChannel :\"someProjectname\" build completed successfully.", messageLog.get(3));
     }
 
     @Test
@@ -148,7 +148,7 @@ public class KrazipIRCPublisherTest {
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest someProjectname");
         mockPublisher.publish(cruiseControlBuildLog);
         messageLog = mockPublisher.getMessageLog();
-        Assert.assertEquals("PRIVMSG testChannel :\"someProjectname\" build completed successfully.", messageLog.get(1));
+        Assert.assertEquals("NOTICE testChannel :\"someProjectname\" build completed successfully.", messageLog.get(1));
     }
 
     @Test
@@ -160,17 +160,17 @@ public class KrazipIRCPublisherTest {
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest follow krazip");
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest unfollow krazip");
         messageLog = mockPublisher.getMessageLog();
-        Assert.assertEquals("PRIVMSG testNick :You are now following project \"krazip\"", messageLog.get(0));
-        Assert.assertEquals("PRIVMSG testNick :You have stopped following project \"krazip\"", messageLog.get(1));
+        Assert.assertEquals("NOTICE testNick :You are now following project \"krazip\"", messageLog.get(0));
+        Assert.assertEquals("NOTICE testNick :You have stopped following project \"krazip\"", messageLog.get(1));
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest follow krazip");
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest follow krazip");
-        Assert.assertEquals("PRIVMSG testNick :You are already following project \"krazip\"", messageLog.get(3));
+        Assert.assertEquals("NOTICE testNick :You are already following project \"krazip\"", messageLog.get(3));
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest follow something1");
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest follow someProjectname");
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest list");
-        Assert.assertEquals("PRIVMSG testNick :You are following : \"krazip\", \"something1\", \"someProjectname\".", messageLog.get(7));
+        Assert.assertEquals("NOTICE testNick :You are following : \"krazip\", \"something1\", \"someProjectname\".", messageLog.get(7));
         mockPublisher.publish(cruiseControlBuildLog);
-        Assert.assertEquals("PRIVMSG testNick :\"someProjectname\" build completed successfully.", messageLog.get(8));
+        Assert.assertEquals("NOTICE testNick :\"someProjectname\" build completed successfully.", messageLog.get(8));
     }
 
     @Test
@@ -180,7 +180,7 @@ public class KrazipIRCPublisherTest {
         KrazipIRCListener listener = new KrazipIRCListener(mockPublisher);
         listener.onPrivmsg("#testChannel", new IRCUser("testNick", "testUser", "testHost"), "kraziptest unfollow something");
         messageLog = mockPublisher.getMessageLog();
-        Assert.assertEquals("PRIVMSG testNick :You are currently not following project \"something\"", messageLog.get(0));
+        Assert.assertEquals("NOTICE testNick :You are currently not following project \"something\"", messageLog.get(0));
     }
 
     @Test
