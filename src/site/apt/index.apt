@@ -124,21 +124,23 @@ Krazip Configuration (config.xml)
 * There are some attributes you can config for Krazip
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-*---------------+-----------------------------------+---------------------------------------------------------------------------------+
-| <<Attribute>> | <<Description>>                   | <<Note>>                                                                        |
-*---------------+-----------------------------------+---------------------------------------------------------------------------------+
-| nickName      | Nick to use on the irc server     | Defaults to "krazip"                                                            |
-*---------------+-----------------------------------+---------------------------------------------------------------------------------+
-| host          | URL for IRC server                | *Required*                                                                      |
-*---------------+-----------------------------------+---------------------------------------------------------------------------------+
-| port          | IRC port                          | Default to 6667                                                                 |
-*---------------+-----------------------------------+---------------------------------------------------------------------------------+
-| channel       | IRC channel for Krazip to publish | *Required*                                                                      |
-*---------------+-----------------------------------+---------------------------------------------------------------------------------+
-| resulturl     | An URL for log file               | *Optional* (Set this if you want to append a link to build log when build fail) |
-*---------------+-----------------------------------+---------------------------------------------------------------------------------+
-| logginglevel  | Logging level for Krazip          | Can be "Pass", "Fail" or "off". Default is "Pass"                               |
-*---------------+-----------------------------------+---------------------------------------------------------------------------------
+*---------------+-----------------------------------+-------------------------------------------------------------------------------------------------+
+| <<Attribute>> | <<Description>>                   | <<Note>>                                                                                        |
+*---------------+-----------------------------------+-------------------------------------------------------------------------------------------------+
+| nickName      | Nick to use on the irc server     | *Optional* Defaults to "krazip"                                                                 |
+*---------------+-----------------------------------+-------------------------------------------------------------------------------------------------+
+| host          | URL for IRC server                | *Required*                                                                                      |
+*---------------+-----------------------------------+-------------------------------------------------------------------------------------------------+
+| port          | IRC port                          | *Optional* Default to 6667                                                                      |
+*---------------+-----------------------------------+-------------------------------------------------------------------------------------------------+
+| channel       | IRC channel for Krazip to publish | *Required*                                                                                      |
+*---------------+-----------------------------------+-------------------------------------------------------------------------------------------------+
+| resulturl     | An URL for log file               | *Optional* (Set this if you want to append a link to build log when build fail)                 |
+*---------------+-----------------------------------+-------------------------------------------------------------------------------------------------+
+| logginglevel  | Logging level for Krazip          | *Optional* Can be "Pass", "Fail" or "off". Default is "Fail" (Report only fail or fixed build.  |
+*---------------+-----------------------------------+-------------------------------------------------------------------------------------------------+
+| usenotice     | Use NOTICE method for publishing message   | *Optinal* Set to "true" if you want to use NOTICE method                               |
+*---------------+-----------------------------------+-------------------------------------------------------------------------------------------------
  
 
 
@@ -194,7 +196,7 @@ Optional : Configure Krazip to report build participant with IRC nickname
   "krazip" build failed. Includes changes by pun@abctech-thailand.com. ((http://abctech-thailand.com/cruisecontrol/buildresults/krazip?log=log20101117154430))
 +---
 
- By default, Krazip will retrieves build participant email from modification element in CruiseControl log. (Email or user if email is not found) Please see below...
+ By default, Krazip will retrieves build participant email from modification element in CruiseControl log. (Email or user if email is not found) Please see below for an example of cruisecontrol log...
 
 +---
 <modification type="git">

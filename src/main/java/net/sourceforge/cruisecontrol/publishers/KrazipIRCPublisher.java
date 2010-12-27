@@ -30,11 +30,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -62,8 +59,6 @@ public class KrazipIRCPublisher implements Publisher {
     private static final String LOGGING = "logging";
     private static final String UNFOLLOW = "unfollow";
     private static final String FOLLOW = "follow";
-    private static final String DATE = "date";
-    private static final String TIME = "time";
     private static final String QUOTATION = "\"";
     private static final String KRAZIP_PROPERTY_FILE = "krazip.properties";
     private static final int ONE_ARGUMENT_PASSED = 1;
@@ -80,8 +75,9 @@ public class KrazipIRCPublisher implements Publisher {
     private String realName = "Krazip CruiseControl IRC publisher";
     private String resultURL = "";
     private String channel;
-    private String loggingLevel = FAIL; // pass, fail(including fixed), off
+    private String loggingLevel = FAIL;
     private String buildResult;
+    private boolean useNotice = false;
 
     /**
      * The main method for publishing build result into IRC. Firstly, initialize an IRC connection,
@@ -122,17 +118,17 @@ public class KrazipIRCPublisher implements Publisher {
                 }
                 if (loggingLevel.trim().equalsIgnoreCase(PASS)) {
                     log.info("Logging level: \"pass\" sending build result to IRC server...");
-                    ensureIrcConnection().doNotice(channel, message);
+                    publishMessageToIrc(channel, message);
                 } else if (loggingLevel.trim().equalsIgnoreCase(FAIL)) {
                     log.info("Logging level: \"fail\" sending only fail and fixed result to IRC server...");
                     if (buildResult.equals(FIXED) || buildResult.equals(FAIL)) {
-                        ensureIrcConnection().doNotice(channel, message);
+                        publishMessageToIrc(channel, message);
                     }
                 } else {
                     log.info("Logging level: \"off\" not sending any build result to IRC server...");
                 }
             } else {
-                log.error("Error: Could not retrieve buildResult or loggingLevel info");
+                log.error("ERROR: Could not retrieve buildResult or loggingLevel info");
             }
         }
     }
@@ -209,7 +205,7 @@ public class KrazipIRCPublisher implements Publisher {
         try {
             logFileName = ccBuildLog.getLogFileName();
         } catch (CruiseControlException e) {
-            log.error("Error: Could not get log file name", e);
+            log.error("ERROR: Could not get log file name", e);
         }
         String baseLogFileName =
                 logFileName.substring(
@@ -258,7 +254,7 @@ public class KrazipIRCPublisher implements Publisher {
         if (msgTmp.length == ONE_ARGUMENT_PASSED) {
             treatSimpleCommand(sender, msgTmp[0].trim());
         } else if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
-            treatComplexCommand(sender, msgTmp[0].trim(),msgTmp[1].trim());
+            treatComplexCommand(sender, msgTmp[0].trim(), msgTmp[1].trim());
         }
     }
 
@@ -280,8 +276,6 @@ public class KrazipIRCPublisher implements Publisher {
             listFollowingProject(sender);
         } else if (command.equalsIgnoreCase(LOGGING)) {
             getOverrideGlobalLoggingLevel();
-        } else if (command.equalsIgnoreCase(DATE) || command.equalsIgnoreCase(TIME)) {
-            tellDateTime();
         } else {
             sendBuildResult(findNewestBuildByName(krazipBuildList, command), command, sender);
         }
@@ -321,7 +315,7 @@ public class KrazipIRCPublisher implements Publisher {
             String followerTmp = aKrazipFollowList.getFollower();
             if (projectNameTmp.equalsIgnoreCase(requestedProjectName.trim()) &&
                     followerTmp.equalsIgnoreCase(sender.trim())) {
-                ensureIrcConnection().doNotice(sender, "You are already following project \"" +
+                publishMessageToIrc(sender, "You are already following project \"" +
                         projectNameTmp + "\"");
                 log.info(sender + " is already following " + projectNameTmp);
                 alreadyFollow = true;
@@ -329,7 +323,7 @@ public class KrazipIRCPublisher implements Publisher {
         }
         if (!alreadyFollow) {
             krazipFollowList.add(new KrazipFollowProject(requestedProjectName, sender));
-            ensureIrcConnection().doNotice(sender, "You are now following project \"" + requestedProjectName + "\"");
+            publishMessageToIrc(sender, "You are now following project \"" + requestedProjectName + "\"");
             log.info("krazipFollowList = " + requestedProjectName + " : " + sender + " (ADDED) size=" +
                     krazipFollowList.size());
             log.info(sender + " is now following " + requestedProjectName);
@@ -350,7 +344,7 @@ public class KrazipIRCPublisher implements Publisher {
             log.info("krazipFollowList = " + projectName + " : " + follower);
             if (projectName.equalsIgnoreCase(requestedProjectName.trim()) && follower.equalsIgnoreCase(sender.trim())) {
                 krazipFollowList.remove(i);
-                ensureIrcConnection().doNotice(sender, "You have stopped following project \"" + projectName + "\"");
+                publishMessageToIrc(sender, "You have stopped following project \"" + projectName + "\"");
                 log.info("krazipFollowList = " + projectName + " : " + follower + " (DELETED) size=" +
                         krazipFollowList.size());
                 log.info(sender + " has stopped following " + projectName);
@@ -359,7 +353,7 @@ public class KrazipIRCPublisher implements Publisher {
             }
         }
         if (!found) {
-            ensureIrcConnection().doNotice(sender, "You are currently not following project \"" +
+            publishMessageToIrc(sender, "You are currently not following project \"" +
                     requestedProjectName + "\"");
             log.info(sender + " is not currently following " + requestedProjectName);
         }
@@ -388,10 +382,10 @@ public class KrazipIRCPublisher implements Publisher {
             }
         }
         if (found) {
-            ensureIrcConnection().doNotice(sender, msg.toString());
+            publishMessageToIrc(sender, msg.toString());
             log.info(msg.toString());
         } else {
-            ensureIrcConnection().doNotice(sender, "You are not following any project");
+            publishMessageToIrc(sender, "You are not following any project");
             log.info(sender + " is not following any project");
         }
     }
@@ -421,10 +415,10 @@ public class KrazipIRCPublisher implements Publisher {
             }
         }
         if (found) {
-            ensureIrcConnection().doNotice(sender, msg.toString());
+            publishMessageToIrc(sender, msg.toString());
             log.info(msg.toString());
         } else {
-            ensureIrcConnection().doNotice(sender, "CruiseControl has not built any projects since started.");
+            publishMessageToIrc(sender, "CruiseControl has not built any projects since started.");
             log.info("Can't list project : CruiseControl has not built any projects since started");
         }
     }
@@ -440,7 +434,7 @@ public class KrazipIRCPublisher implements Publisher {
             String followedProject = aKrazipFollowList.getProjectName();
             if (followedProject.equalsIgnoreCase(projectName)) {
                 String follower = aKrazipFollowList.getFollower();
-                ensureIrcConnection().doNotice(follower, msg);
+                publishMessageToIrc(follower, msg);
             }
         }
     }
@@ -459,14 +453,14 @@ public class KrazipIRCPublisher implements Publisher {
                     "specified project, [list] to list currently following project, [help] to display this message" +
                     ", [logging] to display current logging level, [logging {PASS},{FAIL},{OFF}] to override global" +
                     " logging level";
-            ensureIrcConnection().doNotice(scope, helpMessage);
+            publishMessageToIrc(scope, helpMessage);
         } else {
             if (krazipBuildResult != null && krazipBuildResult.getMessage() != null) {
                 // Send response message to IRC
-                ensureIrcConnection().doNotice(scope, krazipBuildResult.getMessage());
+                publishMessageToIrc(scope, krazipBuildResult.getMessage());
             } else {
                 // Requested projectName not found in ArrayList
-                ensureIrcConnection().doNotice(scope, "Project name \"" + requestedProjectName +
+                publishMessageToIrc(scope, "Project name \"" + requestedProjectName +
                         "\" not found or it haven't been built" +
                         " since CruiseControl started (type \"krazip help\" for help)");
             }
@@ -485,19 +479,19 @@ public class KrazipIRCPublisher implements Publisher {
         if (setting.trim().equalsIgnoreCase(PASS) || setting.trim().equalsIgnoreCase(FAIL) ||
                 setting.trim().equalsIgnoreCase(OFF)) {
             if (KrazipOverrideGlobalLogging.getOverrideValue().equalsIgnoreCase(setting)) {
-                ensureIrcConnection().doNotice(scope, "Current global logging level is already at " +
+                 publishMessageToIrc(scope, "Current global logging level is already at " +
                         QUOTATION + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + QUOTATION +
                         ". Keeping the current setting.");
             } else {
                 KrazipOverrideGlobalLogging.setOverrideValue(setting);
-                ensureIrcConnection().doNotice(scope, "Global logging level has been overridden to : " +
+                 publishMessageToIrc(scope, "Global logging level has been overridden to : " +
                         QUOTATION + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + QUOTATION + " by " + sender);
                 log.info(sender + " has overridden global logging level to : " +
                         QUOTATION + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + QUOTATION);
             }
 
         } else {
-            ensureIrcConnection().doNotice(sender, "Incorrect logging level : {" + PASS.toUpperCase() +
+             publishMessageToIrc(sender, "Incorrect logging level : {" + PASS.toUpperCase() +
                     "} {" + FAIL.toUpperCase() + "} {" + OFF.toUpperCase() + "}");
             log.info(sender + " has put incorrect global logging level :" + setting + " (IGNORED)");
         }
@@ -508,10 +502,10 @@ public class KrazipIRCPublisher implements Publisher {
      */
     protected void getOverrideGlobalLoggingLevel() {
         if (!KrazipOverrideGlobalLogging.getOverrideValue().equalsIgnoreCase("nothing")) {
-            ensureIrcConnection().doNotice(channel, "Global logging level has been overridden to :" +
+             publishMessageToIrc(channel, "Global logging level has been overridden to :" +
                     " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + "\"");
         } else {
-            ensureIrcConnection().doNotice(channel, "Global logging level is : \"" + loggingLevel.toUpperCase() + "\"");
+             publishMessageToIrc(channel, "Global logging level is : \"" + loggingLevel.toUpperCase() + "\"");
         }
     }
 
@@ -558,24 +552,32 @@ public class KrazipIRCPublisher implements Publisher {
                 log.info("Mapping name found for " + participant + ", as " + mappingName);
             }
         } catch (IOException e) {
-            log.error("ERROR : Error in mapping name : " + e.getMessage());
+            log.error("ERROR: Error in mapping name : " + e.getMessage());
         } finally {
             try {
                 if (is != null) {
                     is.close();
                 }
             } catch (IOException e) {
-                log.error("ERROR :  Error closing file stream : " + e.getMessage());
+                log.error("ERROR:  Error closing file stream : " + e.getMessage());
             }
         }
         return mappingName;
     }
 
-    protected void tellDateTime(){
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        Date date = new Date();
-        String dateStr =  dateFormat.format(date);
-        ensureIrcConnection().doNotice(channel, "Current date and time is " + dateStr + ".");
+    /**
+     * For publish message to IRC. By default, Krazip will use normal PRIVMSG method. But optionally user can set it to use
+     * NOTICE method for sending message
+     *
+     * @param scope A publish scope
+     * @param message A message to be published
+     */
+    protected void publishMessageToIrc(String scope, String message) {
+        if (!useNotice){
+            ensureIrcConnection().doPrivmsg(scope, message);
+        } else {
+            ensureIrcConnection().doNotice(scope, message);
+        }
     }
 
     /**
@@ -654,5 +656,13 @@ public class KrazipIRCPublisher implements Publisher {
 
     public void setLoggingLevel(String loggingLevel) {
         this.loggingLevel = loggingLevel;
+    }
+
+    public boolean isUseNotice() {
+        return useNotice;
+    }
+
+    public void setUseNotice(boolean useNotice) {
+        this.useNotice = useNotice;
     }
 }
