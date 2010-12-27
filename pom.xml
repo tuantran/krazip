@@ -23,7 +23,7 @@
     <groupId>com.abctech.krazip</groupId>
     <artifactId>krazip</artifactId>
     <!-- Never update the snapshot version manually! Use a release process. -->
-    <version>1.13</version>
+    <version>1.14-SNAPSHOT</version>
     <name>krazip</name>
 
 
