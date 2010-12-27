@@ -36,7 +36,7 @@ With Krazip installed on your CruiseControl you will be able to :
 
  * Follow particular project. When you follow a project, you will receive every build message for that project, even the Krazip logging is turned off.
  
- * Ask for the latest build result for particular project. Sometime you just need to know the state of the build, you can just type "krazip {projectName}"
+ * Ask for the latest build result for particular project. Sometime you just need to know the state of the build, you can just type "krazip ProjectName"
 
  * (Optional) Mapping email or name in CruiseControl log file with IRC user name with krazip.properties file
 
