@@ -1,0 +1,23 @@
+<project xmlns="http://maven.apache.org/DECORATION/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd"
+  name="SemiSpace">
+    <bannerLeft>
+        <src>http://www.semispace.org/semispace/images/semispace.png</src>
+        <alt>SemiMeter</alt>
+        <href>http://www.semispace.org</href>
+    </bannerLeft>
+  <publishDate position="navigation-bottom" format="dd/MM yyyy"/>
+  <body>
+    <links>
+        <item name="SemiSpace home" href="http://www.semispace.org/semispace"/>
+        <item name="SemiMeter home" href="http://www.semispace.org/semimeter"/>
+    	<!--item name="Continuum" href="http://www.semispace.org/continuum"/-->
+    </links>
+
+    <menu ref="parent" />
+    <menu ref="reports" />
+    <menu ref="modules" />
+
+  </body>
+</project>
