@@ -139,7 +139,7 @@ Krazip Configuration (config.xml)
 *---------------+-----------------------------------+-------------------------------------------------------------------------------------------------+
 | logginglevel  | Logging level for Krazip          | *Optional* Can be "Pass", "Fail" or "off". Default is "Fail" (Report only fail or fixed build.  |
 *---------------+-----------------------------------+-------------------------------------------------------------------------------------------------+
-| usenotice     | Use NOTICE method for publishing message   | *Optinal* Set to "true" if you want to use NOTICE method                               |
+| usenotice     | Use NOTICE method for publishing message   | *Optional* Set to "true" if you want to use NOTICE method                               |
 *---------------+-----------------------------------+-------------------------------------------------------------------------------------------------
  
 
