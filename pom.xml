@@ -40,27 +40,6 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
-    <developers>
-        <developer>
-            <name>Erlend Nossum</name>
-            <email>erland@abctech-thailand.com</email>
-            <organization>ABC Tech Ltd. (Thailand) / APDM Team</organization>
-            <organizationUrl>http://www.abctech-thailand.com</organizationUrl>
-            <roles>
-                <role>Project Leader</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>Pongvech Vechprasit</name>
-            <email>pun@abctech-thailand.com</email>
-            <organization>ABC Tech Ltd. (Thailand) / APDM Team</organization>
-            <organizationUrl>http://www.abctech-thailand.com</organizationUrl>
-            <roles>
-                <role>Main Developer</role>
-            </roles>
-        </developer>
-    </developers>
-
 
     <scm>
         <connection>scm:git:ssh://apdm.int.abctech-thailand.com/opt/git/code/krazip.git</connection>
