@@ -43,12 +43,10 @@ import java.util.Set;
 /**
  * In short, Krazip is a CruiseControl plug-in for sending a CruiseControl build result into IRC server.
  * However you can interact with Krazip via IRC channel by input Krazip known commands. Please refer to Krazip manual.
- * <p>Krazip requires IRClib for working.  (http://moepii.sourceforge.net/)<br>
+ * <p>Krazip requires IRClib for working.  (http://moepii.sourceforge.net/)
  *
  * @author Pongvech Vechprasit (pun@abctech-thailand.com)
  */
-
-
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_BAD_FIELD")
 public class KrazipIRCPublisher implements Publisher {
 

@@ -28,7 +28,7 @@ import org.schwering.irc.lib.IRCEventListener;
 import java.io.IOException;
 
 /**
- * Thjs is a class that implementing Singleton pattern to ensure that Krazip only have one connection to IRC server.
+ * This is a class that implementing Singleton pattern to ensure that Krazip only have one connection to IRC server.
  */
 public final class KrazipIRCConnection {
 

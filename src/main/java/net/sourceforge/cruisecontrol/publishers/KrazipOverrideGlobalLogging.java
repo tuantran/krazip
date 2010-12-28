@@ -22,7 +22,8 @@
 package net.sourceforge.cruisecontrol.publishers;
 
 /**
- * This is a utility class for overriding logging level from the file <code>config.xml</code>. We have to make sure there is only one
+ * This is a utility class for overriding logging level from the file <code>config.xml</code>.
+ * We have to make sure there is only one
  * <code>overrideValue</code> in Krazip so we have to make it <code>static</code>
  */
 public final class KrazipOverrideGlobalLogging {

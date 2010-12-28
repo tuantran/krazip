@@ -22,7 +22,7 @@
 package net.sourceforge.cruisecontrol.publishers;
 
 /**
- * This is an exception class for Krazip. Nothing much here...
+ * Krazip is either configured or used in an unexpected manner.
  */
 public class KrazipUsageException extends RuntimeException {
     public KrazipUsageException(String msg) {

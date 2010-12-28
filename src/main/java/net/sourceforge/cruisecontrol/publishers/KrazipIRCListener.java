@@ -27,7 +27,8 @@ import org.schwering.irc.lib.IRCModeParser;
 import org.schwering.irc.lib.IRCUser;
 
 /**
- * This is a class that implement the <code>IRCEventListener</code> In this case Krazip will handle the event <code>onPrivmsg</code>
+ * This is a class that implement the <code>IRCEventListener</code> In
+ * this case Krazip will handle the event <code>onPrivmsg</code>
  * only. It's for krazip commands input from IRC
  * <p/>
  * Implementation of IRCEventListener
@@ -42,7 +43,6 @@ import org.schwering.irc.lib.IRCUser;
  * <code>PRIVMSG</code>s or numeric replies...
  * </p>
  */
-
 public class KrazipIRCListener implements IRCEventListener {
 
     private static final Logger log = Logger.getLogger(KrazipIRCListener.class);
