@@ -62,6 +62,14 @@
             <organizationUrl>http://www.abctech-thailand.com</organizationUrl>
         </developer>
     </developers>
+    <contributors>
+        <contributor>
+            <name>Phenvipha Savigamin</name>
+            <roles>
+                <role>Logo Designer</role>
+            </roles>
+        </contributor>
+    </contributors>
 
 
     <scm>
