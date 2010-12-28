@@ -36,10 +36,33 @@
     </organization>
     <licenses>
         <license>
-            <name>Apache Software Foundation (ASF)</name>
+            <name>Apache License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
+    <developers>
+        <developer>
+            <name>Erlend Nossum</name>
+            <organization>ABC Tech Ltd. (Thailand) / APDM Team</organization>
+            <organizationUrl>http://www.abctech-thailand.com</organizationUrl>
+        </developer>
+        <developer>
+            <name>Pongvech Vechprasit</name>
+            <organization>ABC Tech Ltd. (Thailand) / APDM Team</organization>
+            <organizationUrl>http://www.abctech-thailand.com</organizationUrl>
+        </developer>
+        <developer>
+            <name>Chiwa Kantawong</name>
+            <organization>ABC Tech Ltd. (Thailand) / APDM Team</organization>
+            <organizationUrl>http://www.abctech-thailand.com</organizationUrl>
+        </developer>
+        <developer>
+            <name>Sutthirak Sangchun</name>
+            <organization>ABC Tech Ltd. (Thailand) / APDM Team</organization>
+            <organizationUrl>http://www.abctech-thailand.com</organizationUrl>
+        </developer>
+    </developers>
+
 
     <scm>
         <connection>scm:git:ssh://apdm.int.abctech-thailand.com/opt/git/code/krazip.git</connection>
