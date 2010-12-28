@@ -11,19 +11,24 @@
 Krazip Overview
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- Krazip were developed by APDM Team at ABC Tech Ltd. (Thailand). {{http://www.abctech-thailand.com}}
-
- Krazip is a CruiseControl plug-in for sending live build result to IRC channel.
+ Krazip is a <<CruiseControl plug-in>> for sending <<live>> build results to an <<IRC>> channel.
  It also has functionality for interaction with user in IRC via commands. For instance, you can override the logging
- level by type "krazip logging {new logging level}. Krazip will override the logging level found in config.xml file.
- There are some other functionality that will be described later.
+ level by type "krazip logging <new logging level>". Krazip will override the logging level found in config.xml file.
+ Details of the functionality will be described later.
 
- Krazip was developed on CruiseControl version 2.8.4 and use external irclib.jar for IRC communication library.
+ Krazip was developed on {{{http://cruisecontrol.sourceforge.net/}CruiseControl version 2.8.4}}
+ and use external irclib.jar for IRC communication library.
  You can find more information and download the library file from {{http://moepii.sourceforge.net/}}
 
- Please click {{{./presentation/krazip/presentation.html}here}} to view Krazip presentation in HTML5 slide.
+ Krazip were developed by APDM Team at {{{http://www.abctech-thailand.com}ABC Tech Ltd.}} (Thailand).
 
- Please click {{{./presentation/krazip_technical/presentation.html}here}} to view Krazip(Technical) presentation in HTML5 slide.
+ Presentations of Krazip:
+
+ * {{{./presentation/krazip/presentation.html}Krazip, general presentation and overview}}
+
+ * {{{./presentation/krazip_technical/presentation.html}A technical presentation of Krazip}}
+
+ []
 
 [images/KrazipOverview.png]
 
@@ -32,11 +37,14 @@ With Krazip installed on your CruiseControl you will be able to :
 
  * Receive live build result from CruiseControl server via IRC message
 
- * Config Krazip logging level to "Pass" to receive every build result, "Fail" for only fail and fixed build and "Off" to turn off the notification from Krazip completely
+ * Config Krazip logging level to "Pass" to receive every build result, "Fail"
+ for only fail and fixed build and "Off" to turn off the notification from Krazip completely
 
- * Follow particular project. When you follow a project, you will receive every build message for that project, even the Krazip logging is turned off.
+ * Follow particular project. When you follow a project, you will receive
+  every build message for that project, even the Krazip logging is turned off.
  
- * Ask for the latest build result for particular project. Sometime you just need to know the state of the build, you can just type "krazip ProjectName"
+ * Ask for the latest build result for particular project. Sometime you just need
+ to know the state of the build, you can just type "krazip ProjectName"
 
  * (Optional) Mapping email or name in CruiseControl log file with IRC user name with krazip.properties file
 
@@ -45,10 +53,11 @@ With Krazip installed on your CruiseControl you will be able to :
 * Krazip Usage and Command in IRC
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- To interact with Krazip. You just type "krazip" follow by a command below. You also make it private by "/msg krazip \{command}"
+ To interact with Krazip. You just type "krazip" (or whichever IRC name that was configured)
+ followed by a command. You send Krazip a private message by typing "/msg krazip <command>"
 
 *---------------+---------------------------------------------------+----------------------------------------------------------------+
-| <<Command>>   | <<Description>>                                   | <<Example>>                                                    |
+|| Command      || Description                                      || Example                                                      ||
 *---------------+---------------------------------------------------+----------------------------------------------------------------+
 | help          | Display help message                              | <krazip help>                                                  |
 *---------------+---------------------------------------------------+----------------------------------------------------------------+
@@ -68,7 +77,9 @@ With Krazip installed on your CruiseControl you will be able to :
 Krazip Installation on CruiseControl 2.8.4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- In short, to install Krazip you need threes things. First CruiseControl that running OK. Second, a Krazip library which is the heart of the Krazip. Try to follow the steps below.
+ In short, to install Krazip you need threes things. First CruiseControl that running OK. Secondly,
+ a Krazip library which is the heart of the Krazip. And, finally, CruiseControl configuration of Krazip.
+ Try to follow the steps below.
 
 * First, of course, you need a CruiseControl
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -77,7 +88,7 @@ Krazip Installation on CruiseControl 2.8.4
 
  * Download and install it
 
- * Make sure everything is work, and then go to next step
+ * Make sure everything is working, and then go to next step
 
  []
 
