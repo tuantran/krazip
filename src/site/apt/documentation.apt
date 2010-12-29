@@ -1,11 +1,11 @@
                     -----
-                    Howto add documentation
+                    Howto update the documentation
                     -----
 
- Our site documentation is now found on
- {{http://abctech.github.com/krazip/}} We hope to
- get it moved to {{http://krazip.abctech-thailand.com}} as it
- would look nice.
+ Our site documentation is now found at
+ {{http://krazip.abctech-thailand.com}}, which
+ is an alias for
+ {{http://abctech.github.com/krazip/}}.
 
 ~~~~~~~~~~~
 How to update the documentation on github

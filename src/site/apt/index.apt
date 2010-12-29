@@ -41,9 +41,9 @@ Krazip Overview
  If you are upgrading Krazip, you need to delete the old file first.
  In other words, something similar to:
 
- -----
- cp krazip-*.jar $CRUISECONTROL_HOME/lib/
- -----
+-----
+cp krazip-*.jar $CRUISECONTROL_HOME/lib/
+-----
 
  For configuration details, continue reading below the overview image.
 
@@ -276,3 +276,6 @@ Troubleshooting : Krazip build fail because cruisecontrol.jar is missing
  
  * Done. Happy coding!! :)
 
+ []
+
+ [{{{./documentation.html}How to update this project documentation}}]
