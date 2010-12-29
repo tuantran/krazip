@@ -30,6 +30,7 @@
     <name>krazip</name>
     <description>Krazip is a CruiseControl plug-in for sending live build result to IRC channel.
         It also has functionality for interaction with user in IRC via commands.</description>
+    <url>http://krazip.abctech-thailand.com</url>
     <organization>
         <name>ABC Tech Ltd. (Thailand)</name>
         <url>http://www.abctech-thailand.com</url>
