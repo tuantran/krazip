@@ -47,6 +47,9 @@ cp krazip-*.jar $CRUISECONTROL_HOME/lib/
 
  For configuration details, continue reading below the overview image.
 
+* Krazip overview image
+~~~~~~~~~~~~~~~~~~~~~~~
+
 [images/KrazipOverview.png]
 
 With Krazip installed on your CruiseControl you will be able to :
@@ -278,4 +281,4 @@ Troubleshooting : Krazip build fail because cruisecontrol.jar is missing
 
  []
 
- [{{{./documentation.html}How to update this project documentation}}]
+** [{{{./documentation.html}How to update this project documentation}}]
