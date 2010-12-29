@@ -47,7 +47,6 @@ import java.util.Set;
  *
  * @author Pongvech Vechprasit (pun@abctech-thailand.com)
  */
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_BAD_FIELD")
 public class KrazipIRCPublisher implements Publisher {
 
     private static final Logger log = Logger.getLogger(KrazipIRCPublisher.class);
