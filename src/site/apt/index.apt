@@ -30,6 +30,21 @@ Krazip Overview
 
  []
 
+* Krazip binary download
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ Go to the {{{https://github.com/abctech/krazip/archives/master}github download area
+ for Krazip}} and download the relevant binary jar file. Normally the one with the
+ highest version number if more than one file is present.
+
+ Install Krazip by copying the jar file to library directory of CruiseControl.
+ If you are upgrading Krazip, you need to delete the old file first.
+ In other words, something similar to:
+
+ -----
+ cp krazip-*.jar $CRUISECONTROL_HOME/lib/
+ -----
+
 [images/KrazipOverview.png]
 
 With Krazip installed on your CruiseControl you will be able to :
