@@ -45,6 +45,8 @@ Krazip Overview
  cp krazip-*.jar $CRUISECONTROL_HOME/lib/
  -----
 
+ For configuration details, continue reading below the overview image.
+
 [images/KrazipOverview.png]
 
 With Krazip installed on your CruiseControl you will be able to :
