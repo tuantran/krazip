@@ -1,0 +1,32 @@
+                    -----
+                    Howto add documentation
+                    -----
+
+ Our site documentation is now found on
+ {{http://abctech.github.com/krazip/}} We hope to
+ get it moved to {{http://krazip.abctech-thailand.com}} as it
+ would look nice.
+
+~~~~~~~~~~~
+How to update the documentation on github
+~~~~~~~~~~~
+
+ You need to have checked out the project from github. Then
+ you need to build the actual documentation, change to the
+ documentation branch, update it, and check in the changes.
+ Preferably, you generate the documentation from a tagged
+ and released version.
+
+ The operations you need to do are as follows:
+
++------
+git clone git@github.com:abctech/krazip.git
+mvn clean install site:jar
+# Need to copy the docs away.
+cp target/*-site.jar ~/.
+git checkout gh-pages
+jar xf ~/*-site.jar
+# Add / delete files as you see fit, and then:
+git commit -a
+git push
++------

@@ -71,10 +71,13 @@
         </contributor>
     </contributors>
 
-
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/abctech/krazip/issues</url>
+    </issueManagement>
     <scm>
-        <connection>scm:git:ssh://apdm.int.abctech-thailand.com/opt/git/code/krazip.git</connection>
-        <url>http://apdm.dev.abctech-thailand.com/gitweb/?p=code/krazip.git</url>
+        <connection>scm:git:ssh://git@github.com:abctech/krazip.git</connection>
+        <url>https://github.com/abctech/krazip</url>
     </scm>
 
     <distributionManagement>
@@ -85,11 +88,6 @@
                 scp://apdm/var/www/maven
             </url>
         </repository>
-        <site>
-            <id>apdm.website</id>
-            <name>apdm.website</name>
-            <url>file:///var/www/snapshot/krazip</url>
-        </site>
     </distributionManagement>
 
     <dependencies>
