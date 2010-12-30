@@ -1,4 +1,5 @@
 Krazip is a CruiseControl plug-in for sending live build results to an IRC channel. It also has functionality for interaction with user in IRC via commands.
 
-http://krazip.abctech-thailand.com - Project information, Installation, Configuration.
+http://krazip.abctech-thailand.com - Krazip project information, Installation, Configuration.
+https://github.com/abctech/krazip - Krazip's Github page.
 https://www.ohloh.net/p/krazip - Krazip's Ohloh page.
