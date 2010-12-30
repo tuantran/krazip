@@ -46,6 +46,7 @@ import org.schwering.irc.lib.IRCUser;
 public class KrazipIRCListener implements IRCEventListener {
 
     private static final Logger log = Logger.getLogger(KrazipIRCListener.class);
+    private static final int NAME_OR_CHANNEL_NOT_FOUND = 401;
     private final KrazipIRCPublisher krazipIRCPublisher;
 
     public KrazipIRCListener(KrazipIRCPublisher krazipIRCPublisher) {
@@ -63,7 +64,7 @@ public class KrazipIRCListener implements IRCEventListener {
 
     public void onError(int num, String msg) {
         log.warn("Error: " + num + " : " + msg);
-        if (num != 401) { // Eror401 : user/channel not found. We don't need to release connection.
+        if (num != NAME_OR_CHANNEL_NOT_FOUND) { // Eror401 : user/channel not found. We don't need to release connection.
             releaseConnection();
         }
     }
