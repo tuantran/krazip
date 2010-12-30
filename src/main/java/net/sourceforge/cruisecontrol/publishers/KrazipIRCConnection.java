@@ -63,7 +63,8 @@ public final class KrazipIRCConnection {
 
     public static synchronized IRCConnection retrieveInstance() {
         if ( instance == null) {
-            throw new KrazipUsageException("You should always establish the instance before using it.");            
+            log.warn("IRC connection is null.");
+            return null;
         }
         return instance.realConnection;
     }

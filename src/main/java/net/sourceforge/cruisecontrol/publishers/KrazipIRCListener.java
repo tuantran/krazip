@@ -63,7 +63,9 @@ public class KrazipIRCListener implements IRCEventListener {
 
     public void onError(int num, String msg) {
         log.warn("Error: " + num + " : " + msg);
-        releaseConnection();
+        if (num != 401) { // Eror401 : user/channel not found. We don't need to release connection.
+            releaseConnection();
+        }
     }
 
     public void onInvite(String chan, IRCUser user, String passiveNick) {
@@ -71,7 +73,7 @@ public class KrazipIRCListener implements IRCEventListener {
     }
 
     public void onJoin(String chan, IRCUser user) {
-        log.info("Join: " + chan);
+        log.info("Join: " + user + " joins " + chan);
     }
 
     public void onKick(String chan, IRCUser user, String passiveNick,
@@ -137,6 +139,9 @@ public class KrazipIRCListener implements IRCEventListener {
 
     public void releaseConnection() {
         log.error("An error occurred. Releasing IRC connection and try connect again next build");
+        if (KrazipIRCConnection.retrieveInstance() != null) {
+            krazipIRCPublisher.ensureIrcConnection().doQuit();
+        }
         KrazipIRCConnection.destroyInstance();
     }
 

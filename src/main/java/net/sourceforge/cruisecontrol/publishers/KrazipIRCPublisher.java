@@ -166,8 +166,9 @@ public class KrazipIRCPublisher implements Publisher {
         }
         krazipBuildList.add(new KrazipBuildResult(projectName, msg, buildTimeStamp));
         log.info("buildResult added to krazipBuildList, Total number of items : " + krazipBuildList.size());
-        sendMessageToFollower(projectName, msg);
         log.info("Sending build result to follower...");
+        sendMessageToFollower(projectName, msg);
+
         return msg;
     }
 
@@ -238,7 +239,7 @@ public class KrazipIRCPublisher implements Publisher {
             if (msgTmp.length == TWO_ARGUMENTS_PASSED) {
                 treatSimpleCommand(sender, msgTmp[1].trim());
             } else if (msgTmp.length == THREE_ARGUMENTS_PASSED) {
-                treatComplexCommand(sender, msgTmp[1].trim(),msgTmp[2].trim());
+                treatComplexCommand(sender, msgTmp[1].trim(), msgTmp[2].trim());
             }
         }
     }
@@ -265,7 +266,8 @@ public class KrazipIRCPublisher implements Publisher {
      * <li>[list] - To display project list and project that requester currently following</li>
      * <li>[logging] - To display current logging level</li>
      * </ul>
-     * @param sender person who send the message
+     *
+     * @param sender  person who send the message
      * @param command Krazip's command
      */
     protected void treatSimpleCommand(String sender, String command) {
@@ -288,9 +290,10 @@ public class KrazipIRCPublisher implements Publisher {
      * <li>[unfollow {projectName}] - To unfollow a project</li>
      * <li>[logging {PASS}{FAIL}{OFF}] - To override global logging level</li>
      * </ul>
-     * @param sender person who send the message
+     *
+     * @param sender  person who send the message
      * @param command Krazip's command
-     * @param target command's argument
+     * @param target  command's argument
      */
     protected void treatComplexCommand(String sender, String command, String target) {
         if (command.equalsIgnoreCase(FOLLOW)) {
@@ -341,12 +344,9 @@ public class KrazipIRCPublisher implements Publisher {
         for (int i = 0; i < krazipFollowList.size(); i++) {
             String projectName = krazipFollowList.get(i).getProjectName();
             String follower = krazipFollowList.get(i).getFollower();
-            log.info("krazipFollowList = " + projectName + " : " + follower);
             if (projectName.equalsIgnoreCase(requestedProjectName.trim()) && follower.equalsIgnoreCase(sender.trim())) {
                 krazipFollowList.remove(i);
                 publishMessageToIrc(sender, "You have stopped following project \"" + projectName + "\"");
-                log.info("krazipFollowList = " + projectName + " : " + follower + " (DELETED) size=" +
-                        krazipFollowList.size());
                 log.info(sender + " has stopped following " + projectName);
                 found = true;
                 break;
@@ -358,6 +358,16 @@ public class KrazipIRCPublisher implements Publisher {
             log.info(sender + " is not currently following " + requestedProjectName);
         }
     }
+
+/*    protected void unfollow(String user) {
+        for (int i=0; i < krazipFollowList.size(); i++) {
+            String followerName = krazipFollowList.get(i).getFollower();
+            if (followerName.equalsIgnoreCase(user)) {
+                log.info(user + " has been removed from " + krazipFollowList.get(i).getProjectName() + " follow list");
+                krazipFollowList.remove(i);
+            }
+        }
+    }*/
 
     /**
      * For listing project that user following
@@ -434,7 +444,9 @@ public class KrazipIRCPublisher implements Publisher {
             String followedProject = aKrazipFollowList.getProjectName();
             if (followedProject.equalsIgnoreCase(projectName)) {
                 String follower = aKrazipFollowList.getFollower();
+                log.info("Send direct build result to \"" + follower + "\"");
                 publishMessageToIrc(follower, msg);
+                ensureIrcConnection().doIson(follower);
             }
         }
     }
@@ -479,19 +491,19 @@ public class KrazipIRCPublisher implements Publisher {
         if (setting.trim().equalsIgnoreCase(PASS) || setting.trim().equalsIgnoreCase(FAIL) ||
                 setting.trim().equalsIgnoreCase(OFF)) {
             if (KrazipOverrideGlobalLogging.getOverrideValue().equalsIgnoreCase(setting)) {
-                 publishMessageToIrc(scope, "Current global logging level is already at " +
+                publishMessageToIrc(scope, "Current global logging level is already at " +
                         QUOTATION + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + QUOTATION +
                         ". Keeping the current setting.");
             } else {
                 KrazipOverrideGlobalLogging.setOverrideValue(setting);
-                 publishMessageToIrc(scope, "Global logging level has been overridden to : " +
+                publishMessageToIrc(scope, "Global logging level has been overridden to : " +
                         QUOTATION + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + QUOTATION + " by " + sender);
                 log.info(sender + " has overridden global logging level to : " +
                         QUOTATION + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + QUOTATION);
             }
 
         } else {
-             publishMessageToIrc(sender, "Incorrect logging level : {" + PASS.toUpperCase() +
+            publishMessageToIrc(sender, "Incorrect logging level : {" + PASS.toUpperCase() +
                     "} {" + FAIL.toUpperCase() + "} {" + OFF.toUpperCase() + "}");
             log.info(sender + " has put incorrect global logging level :" + setting + " (IGNORED)");
         }
@@ -502,10 +514,10 @@ public class KrazipIRCPublisher implements Publisher {
      */
     protected void getOverrideGlobalLoggingLevel() {
         if (!KrazipOverrideGlobalLogging.getOverrideValue().equalsIgnoreCase("nothing")) {
-             publishMessageToIrc(channel, "Global logging level has been overridden to :" +
+            publishMessageToIrc(channel, "Global logging level has been overridden to :" +
                     " \"" + KrazipOverrideGlobalLogging.getOverrideValue().toUpperCase() + "\"");
         } else {
-             publishMessageToIrc(channel, "Global logging level is : \"" + loggingLevel.toUpperCase() + "\"");
+            publishMessageToIrc(channel, "Global logging level is : \"" + loggingLevel.toUpperCase() + "\"");
         }
     }
 
@@ -569,11 +581,11 @@ public class KrazipIRCPublisher implements Publisher {
      * For publish message to IRC. By default, Krazip will use normal PRIVMSG method. But optionally user can set it to use
      * NOTICE method for sending message
      *
-     * @param scope A publish scope
+     * @param scope   A publish scope
      * @param message A message to be published
      */
     protected void publishMessageToIrc(String scope, String message) {
-        if (!useNotice){
+        if (!useNotice) {
             ensureIrcConnection().doPrivmsg(scope, message);
         } else {
             ensureIrcConnection().doNotice(scope, message);
