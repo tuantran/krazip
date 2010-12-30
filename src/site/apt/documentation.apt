@@ -2,6 +2,9 @@
                     Howto update the documentation
                     -----
 
+ <<Notice:>> Project internal notes about how to update the
+ documentation on github.
+
  Our site documentation is now found at
  {{http://krazip.abctech-thailand.com}}, which
  is an alias for
@@ -14,8 +17,8 @@ How to update the documentation on github
  You need to have checked out the project from github. Then
  you need to build the actual documentation, change to the
  documentation branch, update it, and check in the changes.
- Preferably, you generate the documentation from a tagged
- and released version.
+ Preferably, you generate the documentation from a <tagged
+ and released> version.
 
  The operations you need to do are as follows:
 
@@ -30,3 +33,6 @@ jar xf ~/*-site.jar
 git commit -a
 git push
 +------
+
+ You will get an email from github confirming that the pages have
+ been updated.
