@@ -29,6 +29,7 @@ mvn clean install site:jar
 cp target/*-site.jar ~/.
 git checkout gh-pages
 jar xf ~/*-site.jar
+rm -i ~/*-site.jar
 # Add / delete files as you see fit, and then:
 git commit -a
 git push
