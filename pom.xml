@@ -87,7 +87,7 @@
             <id>abctech-repository</id>
             <name>Abctech Repository</name>
             <url>
-                scp://apdm/var/www/maven
+                scp://apdm.int.abctech-thailand.com/var/www/maven
             </url>
         </repository>
         <site>
