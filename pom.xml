@@ -86,8 +86,9 @@
         <repository>
             <id>abctech-repository</id>
             <name>Abctech Repository</name>
+            <!-- Mysterious problem using the full dns name of apdm.int.abctech-thailand.com -->
             <url>
-                scp://apdm.int.abctech-thailand.com/var/www/maven
+                scp://apdm/var/www/maven
             </url>
         </repository>
         <site>
