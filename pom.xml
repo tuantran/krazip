@@ -77,8 +77,8 @@
         <url>https://github.com/abctech/krazip/issues</url>
     </issueManagement>
     <scm>
-        <connection>scm:git://github.com/abctech/krazip.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:abctech/krazip.git</developerConnection>
+        <connection>scm:git:git://github.com/abctech/krazip.git</connection>
+        <developerConnection>scm:git:git@github.com:abctech/krazip.git</developerConnection>
         <url>https://github.com/abctech/krazip</url>
     </scm>
 
