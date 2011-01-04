@@ -78,7 +78,7 @@
     </issueManagement>
     <scm>
         <connection>scm:git:git://github.com/abctech/krazip.git</connection>
-        <developerConnection>scm:git:git://github.com:abctech/krazip.git</developerConnection>
+        <developerConnection>scm:git:ssh://git@github.com/abctech/krazip.git</developerConnection>
         <url>https://github.com/abctech/krazip</url>
     </scm>
 
@@ -86,9 +86,8 @@
         <repository>
             <id>abctech-repository</id>
             <name>Abctech Repository</name>
-            <!-- Mysterious problem using the full dns name of apdm.int.abctech-thailand.com -->
             <url>
-                scp://apdm/var/www/maven
+                scp://apdm.int.abctech-thailand.com/var/www/maven
             </url>
         </repository>
         <site>
